@@ -1,6 +1,7 @@
 package com.example.project.model;
 
 public class Car {
+    private int id;
     private String spz;
     private String color;
     private int numberOfSeats;
@@ -11,10 +12,15 @@ public class Car {
     }
 
     public Car(String spz, String color, int numberOfSeats, float tankCapacity) {
+        this.id = -1;
         this.spz = spz;
         this.color = color;
         this.tankCapacity = tankCapacity;
         this.numberOfSeats = numberOfSeats;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getSpz() {
@@ -31,6 +37,10 @@ public class Car {
 
     public float getTankCapacity() {
         return tankCapacity;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setSpz(String spz) {

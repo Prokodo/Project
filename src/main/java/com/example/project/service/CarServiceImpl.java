@@ -23,17 +23,17 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public void removeCarById(final int id) {
-        if (id > -1 && cars.size() > id) {
-            cars.remove(id);
-        }
-    }
-
-    @Override
-    public void saveCar(final Car car) {
+    public void saveNewCar(final Car car) {
         if (car.getId() > -1) {
             cars.remove(car.getId());
         }
         cars.add(car);
+    }
+
+    @Override
+    public void removeCarById(final int id) {
+        if (id > -1 && cars.size() > id) {
+            cars.remove(id);
+        }
     }
 }

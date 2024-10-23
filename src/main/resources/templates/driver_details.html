@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <title>Driver details</title>
+  </head>
+
+  <body>
+    <a th:href="@{'/drivers/edit/' + ${index}}">Edit</a> <br/>
+    <a th:href="@{'/drivers/delete/' + ${index}}">Delete driver</a>
+
+    <div>
+      Name:
+      <span th:text="${driver.name}"></span>
+    </div>
+
+    <div>
+      Age:
+      <span th:text="${driver.age}"></span>
+    </div>
+
+    <div>
+      Salary:
+      <span th:text="${driver.salary}"></span>
+    </div>
+  </body>
+</html>

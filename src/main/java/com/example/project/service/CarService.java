@@ -10,5 +10,5 @@ public interface CarService {
     ArrayList<Car> getAllCars();
     Car getCarById(int id);
     void removeCarById(int id);
-    void saveCar(Car car);
+    void saveNewCar(Car car);
 }

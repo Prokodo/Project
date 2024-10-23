@@ -2,29 +2,27 @@ package com.example.project.controller;
 
 import com.example.project.model.Car;
 import com.example.project.service.CarService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
+@RequestMapping("/cars")
 public class CarController {
     private final CarService carService;
 
     @Autowired
     public CarController(CarService carService) {
         this.carService = carService;
-
-        carService.getAllCars().add(new Car("ABCDE 123", "blue", 20, 20.5F));
     }
 
     @GetMapping("/")
     public String getCars(Model model) {
         model.addAttribute("cars",  carService.getAllCars());
-        return "cars";
+        return "car_list";
     }
 
     @GetMapping("/details/{index}")
@@ -32,28 +30,32 @@ public class CarController {
         Car car = carService.getCarById(index);
         if (car != null) {
             model.addAttribute("car", car);
-            return "details";
+            return "car_details";
         }
-        return "redirect:/";
+        return "redirect:/cars/";
     }
 
     @GetMapping("/delete/{index}")
     public String delete(@PathVariable int index) {
         carService.removeCarById(index);
-        return "redirect:/";
+        return "redirect:/cars/";
     }
 
     @GetMapping("/create")
     public String create(Model model) {
         model.addAttribute("car",  new Car());
         model.addAttribute("edit", false);
-        return "edit";
+        return "car_edit";
     }
 
     @PostMapping("/save")
-    public String save(@ModelAttribute Car car) {
-        carService.saveCar(car);
-        return "redirect:/";
+    public String save(@Valid Car car, Model model, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("edit", true);
+            return "car_edit";
+        }
+        carService.saveNewCar(car);
+        return "redirect:/cars/";
     }
 
     @GetMapping("/edit/{index}")
@@ -63,8 +65,8 @@ public class CarController {
             car.setId(index);
             model.addAttribute("car", car);
             model.addAttribute("edit", true);
-            return "edit";
+            return "car_edit";
         }
-        return "redirect:/";
+        return "redirect:/cars/";
     }
 }

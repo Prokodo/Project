@@ -1,22 +1,23 @@
 package com.example.project.model;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public class Car {
     private int id;
+
+    @Size(min = 7, max = 7)
     private String spz;
+    @NotBlank
     private String color;
+    @Min(value = 1)
     private int numberOfSeats;
+    @Size(min = 30, max = 70)
     private float tankCapacity;
 
     public Car() {
-
-    }
-
-    public Car(String spz, String color, int numberOfSeats, float tankCapacity) {
         this.id = -1;
-        this.spz = spz;
-        this.color = color;
-        this.tankCapacity = tankCapacity;
-        this.numberOfSeats = numberOfSeats;
     }
 
     public int getId() {
@@ -39,23 +40,23 @@ public class Car {
         return tankCapacity;
     }
 
-    public void setId(int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
-    public void setSpz(String spz) {
+    public void setSpz(final String spz) {
         this.spz = spz;
     }
 
-    public void setColor(String color) {
+    public void setColor(final String color) {
         this.color = color;
     }
 
-    public void setNumberOfSeats(int numberOfSeats) {
+    public void setNumberOfSeats(final int numberOfSeats) {
         this.numberOfSeats = numberOfSeats;
     }
 
-    public void setTankCapacity(float tankCapacity) {
+    public void setTankCapacity(final float tankCapacity) {
         this.tankCapacity = tankCapacity;
     }
 }

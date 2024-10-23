@@ -6,12 +6,21 @@
   </head>
 
   <body>
-    <form th:action="@{'/save'}" method="post" th:object="${car}">
+    <form th:action="@{'/cars/save'}" method="post" th:object="${car}">
       <input type="hidden" th:field="*{id}"/>
+
       SPZ:<input type="text" th:field="*{spz}"></input>
+      <span th:if="${#fields.hasErrors('spz')}" th:errors="*{spz}"></span><br>
+
       Color:<input type="text" th:field="*{color}"></input>
+      <span th:if="${#fields.hasErrors('color')}" th:errors="*{color}"></span><br>
+
       Tank:<input type="text" th:field="*{tankCapacity}"></input>
+      <span th:if="${#fields.hasErrors('tankCapacity')}" th:errors="*{tankCapacity}"></span><br>
+
       Seats:<input type="text" th:field="*{numberOfSeats}"></input>
+      <span th:if="${#fields.hasErrors('numberOfSeats')}" th:errors="*{numberOfSeats}"></span><br>
+
       <input type="submit" value="Save"></input>
     </form>
   </body>

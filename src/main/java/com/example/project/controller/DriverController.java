@@ -26,9 +26,9 @@ public class DriverController {
         return "driver_list";
     }
 
-    @GetMapping("/details/{index}")
-    public String getDetails(Model model, @PathVariable int index) {
-        Driver driver = driverService.getDriverById(index);
+    @GetMapping("/details/{id}")
+    public String getDetails(Model model, @PathVariable long id) {
+        Driver driver = driverService.getDriverById(id);
         if (driver != null) {
             model.addAttribute("driver", driver);
             return "driver_details";
@@ -36,21 +36,21 @@ public class DriverController {
         return "redirect:/drivers/";
     }
 
-    @GetMapping("/delete/{index}")
-    public String delete(@PathVariable int index) {
-        driverService.removeDriverById(index);
+    @GetMapping("/delete/{id}")
+    public String delete(@PathVariable long id) {
+        driverService.removeDriverById(id);
         return "redirect:/drivers/";
     }
 
     @GetMapping("/create")
     public String create(Model model) {
-        model.addAttribute("driver",  new Driver());
+        model.addAttribute("driver", new Driver());
         model.addAttribute("edit", false);
         return "driver_edit";
     }
 
     @PostMapping("/save")
-    public String save(@Valid Driver driver, Model model, BindingResult bindingResult) {
+    public String save(@Valid Driver driver, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("edit", true);
             return "driver_edit";
@@ -59,11 +59,10 @@ public class DriverController {
         return "redirect:/drivers/";
     }
 
-    @GetMapping("/edit/{index}")
-    public String delete(Model model, @PathVariable int index) {
-        Driver driver = driverService.getDriverById(index);
+    @GetMapping("/edit/{id}")
+    public String delete(Model model, @PathVariable long id) {
+        Driver driver = driverService.getDriverById(id);
         if (driver != null) {
-            driver.setId(index);
             model.addAttribute("driver", driver);
             model.addAttribute("edit", true);
             return "driver_edit";

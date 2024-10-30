@@ -1,11 +1,16 @@
 package com.example.project.model;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+@Entity
+@Table(name = "Cars")
 public class Car {
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @Size(min = 7, max = 7)
     private String spz;
@@ -16,11 +21,7 @@ public class Car {
     @Size(min = 30, max = 70)
     private float tankCapacity;
 
-    public Car() {
-        this.id = -1;
-    }
-
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -40,7 +41,7 @@ public class Car {
         return tankCapacity;
     }
 
-    public void setId(final int id) {
+    public void setId(final long id) {
         this.id = id;
     }
 

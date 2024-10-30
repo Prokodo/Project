@@ -1,30 +1,31 @@
 package com.example.project.model;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
+@Entity
+@Table(name = "Drivers")
 public class Driver {
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-    @Min(value = 18, message = "Age must be at least 18.")
-    @Max(value = 99, message = "Age must be lower than 99.")
+    //@Min(value = 18, message = "Age must be at least 18.")
+    //@Max(value = 99, message = "Age must be lower than 99.")
     private int age;
 
-    @Min(value = 10000)
+    //@Min(value = 10000)
     private int salary;
 
-    @NotBlank(message = "Name is required.")
-    @Size(min = 5, message = "Name must be at least 5 characters long.")
+    //@NotBlank(message = "Name is required.")
+    //@Size(min = 5, message = "Name must be at least 5 characters long.")
     private String name;
 
-    public Driver() {
-        this.id = -1;
-    }
-
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(final int id) {
+    public void setId(final long id) {
         this.id = id;
     }
 

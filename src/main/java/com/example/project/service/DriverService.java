@@ -2,12 +2,11 @@ package com.example.project.service;
 
 import com.example.project.model.Driver;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface DriverService {
-    ArrayList<Driver> getAllDrivers();
-    Driver getDriverById(int id);
-    void removeDriverById(int id);
+    List<Driver> getAllDrivers();
+    Driver getDriverById(long id);
+    void removeDriverById(long id);
     void saveNewDriver(Driver driver);
-    int getCount();
 }

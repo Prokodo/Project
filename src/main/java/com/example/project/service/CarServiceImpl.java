@@ -1,39 +1,40 @@
 package com.example.project.service;
 
 import com.example.project.model.Car;
+import com.example.project.repository.CarRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CarServiceImpl implements CarService {
-    ArrayList<Car> cars = new ArrayList<>();
+    CarRepository carRepository;
 
-    @Override
-    public ArrayList<Car> getAllCars() {
-        return cars;
+    @Autowired
+    public CarServiceImpl(final CarRepository carRepository) {
+        this.carRepository = carRepository;
     }
 
     @Override
-    public Car getCarById(final int id) {
-        if (id > -1 && cars.size() > id) {
-            return cars.get(id);
-        }
-        return null;
+    public List<Car> getAllCars() {
+        return carRepository.findAll();
+    }
+
+    @Override
+    public Car getCarById(final long id) {
+        return carRepository.findById(id).orElse(null);
     }
 
     @Override
     public void saveNewCar(final Car car) {
-        if (car.getId() > -1) {
-            cars.remove(car.getId());
-        }
-        cars.add(car);
+        carRepository.save(car);
     }
 
     @Override
-    public void removeCarById(final int id) {
-        if (id > -1 && cars.size() > id) {
-            cars.remove(id);
-        }
+    public void removeCarById(final long id) {
+        carRepository.findById(id).ifPresent(value -> {
+            carRepository.delete(value);
+        });
     }
 }

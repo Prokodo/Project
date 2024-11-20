@@ -3,6 +3,8 @@ package com.example.project.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "Drivers")
 public class Driver {
@@ -20,6 +22,13 @@ public class Driver {
     //@NotBlank(message = "Name is required.")
     //@Size(min = 5, message = "Name must be at least 5 characters long.")
     private String name;
+
+    @OneToMany(mappedBy = "driver")
+    private List<Car> cars;
+
+    public List<Car> getCars() {
+        return cars;
+    }
 
     public long getId() {
         return id;

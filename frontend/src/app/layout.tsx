@@ -14,9 +14,9 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
             <body>
                 <SidebarProvider>
                     <AppSidebar />
-                    <main>
+                    <main className="w-full">
                         <SidebarTrigger />
-                    {children}
+                        {children}
                     </main>
                 </SidebarProvider>
             </body>

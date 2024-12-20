@@ -1,11 +1,14 @@
 "use client"
 
 import {z} from "zod";
+import {Property} from "@/types/types";
 import {useForm} from "react-hook-form";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {zodResolver} from "@hookform/resolvers/zod";
+import {useProperties} from "@/components/properties/PropertiesContext";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {Dispatch, FC, SetStateAction} from "react";
 
 const formSchema = z.object({
     name: z.string().nonempty("Name is required"),
@@ -15,7 +18,8 @@ const formSchema = z.object({
     propertyValue: z.string().nonempty("Value is required"),
 });
 
-const PropertiesForm = () => {
+const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>> }> = ({ setIsOpen }) => {
+    const {addProperty} = useProperties();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -30,17 +34,16 @@ const PropertiesForm = () => {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
             const response = await fetch("http://localhost:8080/api/properties", {
-                method: "POST",
-                headers: {
+                method: "POST", headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(values),
             });
 
             if (response.ok) {
-                const data = await response.json();
-                alert("Property created successfully!");
-                console.log("Created Property:", data);
+                const data: Property = await response.json();
+                addProperty(data);
+                setIsOpen(false);
             } else {
                 alert("Failed to create property.");
                 console.error("Error:", response.statusText);

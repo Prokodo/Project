@@ -24,7 +24,7 @@ const PropertyPopupForm = () => {
                             ✖
                         </button>
                         <h2 className="text-2xl font-bold text-center mb-6">Create new property</h2>
-                        <PropertiesForm />
+                        <PropertiesForm setIsOpen={setIsOpen} />
                     </div>
                 </div>
             )}

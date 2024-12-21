@@ -9,19 +9,22 @@ public class Property {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Lob
+    private byte[] image;
+
     private String name;
     private String type;
+    private Float price;
     private String address;
     private String description;
-    private String propertyValue;
 
     public Property() {}
 
-    public Property(final long id, final String name, final String type, final String value, final String address, final String description) {
+    public Property(final long id, final String name, final String type, final Float price, final String address, final String description) {
         this.id = id;
         this.name = name;
         this.type = type;
-        this.propertyValue = value;
+        this.price = price;
         this.address = address;
         this.description = description;
     }
@@ -40,8 +43,12 @@ public class Property {
         return type;
     }
 
-    public String getValue() {
-        return propertyValue;
+    public Float getPrice() {
+        return price;
+    }
+
+    public byte[] getImage() {
+        return image;
     }
 
     public String getAddress() {
@@ -64,8 +71,12 @@ public class Property {
         this.type = type;
     }
 
-    public void setValue(final String value) {
-        this.propertyValue = value;
+    public void setPrice(final Float price) {
+        this.price = price;
+    }
+
+    public void setImage(final byte[] image) {
+        this.image = image;
     }
 
     public void setAddress(final String address) {

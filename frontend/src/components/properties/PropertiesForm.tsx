@@ -5,44 +5,59 @@ import {Property} from "@/types/types";
 import {useForm} from "react-hook-form";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
+import {Dispatch, FC, SetStateAction} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useProperties} from "@/components/properties/PropertiesContext";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {Dispatch, FC, SetStateAction} from "react";
 
 const formSchema = z.object({
     name: z.string().nonempty("Name is required"),
     type: z.string().nonempty("Type is required"),
     address: z.string().nonempty("Address is required"),
     description: z.string().optional(),
-    propertyValue: z.string().nonempty("Value is required"),
+    price: z.number().min(0.1, "Price is required"),
 });
 
-const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>> }> = ({ setIsOpen }) => {
-    const {addProperty} = useProperties();
+const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, propertyToEdit?: Property }> = ({ setIsOpen, propertyToEdit }) => {
+    const { addProperty, editProperty } = useProperties();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            name: "",
-            type: "",
-            address: "",
-            description: "",
-            propertyValue: "",
+            name: propertyToEdit?.name || "",
+            type: propertyToEdit?.type || "",
+            address: propertyToEdit?.address || "",
+            description: propertyToEdit?.description || "",
+            price: propertyToEdit?.price || 0,
         },
     });
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
-            const response = await fetch("http://localhost:8080/api/properties", {
-                method: "POST", headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(values),
+            const formData = new FormData();
+            const propertyBlob = new Blob([
+                JSON.stringify({
+                    name: values.name,
+                    type: values.type,
+                    price: values.price,
+                    address: values.address,
+                    description: values.description,
+                }),
+            ], { type: "application/json" });
+            formData.append("property", propertyBlob);
+            //if (values.imageFile) {
+            //   formData.append("imageFile", values.imageFile);
+            //}
+
+            const url: string = propertyToEdit ? `http://localhost:8080/api/properties/${propertyToEdit.id}` : "http://localhost:8080/api/properties";
+            const response = await fetch(url, {
+                method: propertyToEdit ? "PUT" : "POST",
+                body: formData,
             });
 
             if (response.ok) {
                 const data: Property = await response.json();
-                addProperty(data);
+                if (propertyToEdit) editProperty(data);
+                else addProperty(data);
                 setIsOpen(false);
             } else {
                 alert("Failed to create property.");
@@ -97,22 +112,22 @@ const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>> }> = ({ 
                     </FormItem>
                 )}/>
 
-                <FormField control={form.control} name="propertyValue" render={({field}) => (
+                <FormField control={form.control} name="price" render={({field}) => (
                     <FormItem>
-                        <FormLabel>Value</FormLabel>
+                        <FormLabel>Price</FormLabel>
                         <FormControl>
-                            <Input placeholder="Property Value" {...field} />
+                            <Input type="number" placeholder="Property price" {...field} onChange={(e): void => {
+                                const value: number | null = e.target.value === "" ? null : parseFloat(e.target.value);
+                                field.onChange(value);
+                            }} />
                         </FormControl>
                         <FormMessage/>
                     </FormItem>
                 )}/>
-                <Button type="submit">Create new property</Button>
+                <Button type="submit">{propertyToEdit ? "Save Changes" : "Create New Property"}</Button>
             </form>
         </Form>
     );
 };
 
 export default PropertiesForm;
-
-
-

@@ -3,8 +3,8 @@ interface Property {
     name: string;
     type: string;
     address: string;
-    description: string;
-    value: string | null;
+    description: string | undefined;
+    price: number;
 }
 
 export type { Property };

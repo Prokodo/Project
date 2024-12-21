@@ -4,8 +4,10 @@ import com.backend.model.Property;
 import com.backend.service.PropertyServiceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -41,9 +43,19 @@ public class PropertyController {
 
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
+    /*
     @PostMapping
     public Property createProperty(final @RequestBody Property property) {
         return propertyService.saveProperty(property);
+    }
+     */
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Property createProperty(
+        @RequestPart("property") @NotNull Property property,
+        @RequestPart(value = "file", required = false) MultipartFile imageFile
+    ) {
+        return propertyService.saveProperty(property, imageFile);
     }
 
     @DeleteMapping("/{id}")
@@ -55,8 +67,12 @@ public class PropertyController {
         return ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Property> updateProperty(final @PathVariable long id, final @RequestBody Property updatedProperty) {
+    @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Property> updateProperty(
+        final @PathVariable long id,
+        @RequestPart("property") @NotNull Property updatedProperty,
+        @RequestPart(value = "file", required = false) MultipartFile imageFile
+    ) {
         try {
             return ResponseEntity.ok(propertyService.updateProperty(id, updatedProperty));
         } catch (RuntimeException e) {

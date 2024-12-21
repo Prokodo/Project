@@ -1,28 +1,30 @@
 "use client"
 
-import {useState} from "react";
+import React, {useState} from "react";
 import {Property} from "@/types/types";
 import {DataTable} from "@/components/properties/DataTable";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import {useProperties} from "@/components/properties/PropertiesContext";
+import PropertiesForm from "@/components/properties/PropertiesForm";
 
 const PropertiesList = () => {
     const { properties, setProperties } = useProperties();
 
     const [error, setError] = useState<string | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-    const [propertyToDelete, setPropertyToDelete] = useState<Property | null>(null);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
+    const [propertyToEdit, setPropertyToEdit] = useState<Property | null>(null);
 
     const handleDelete = async (): Promise<void> => {
-        if (propertyToDelete) {
+        if (propertyToEdit) {
             try {
-                const response = await fetch(`http://localhost:8080/api/properties/${propertyToDelete.id}`, {
+                const response = await fetch(`http://localhost:8080/api/properties/${propertyToEdit.id}`, {
                     method: "DELETE",
                 });
 
                 if (response.ok) {
                     const updatedProperties: Property[] = properties.filter(
-                        (property: Property): boolean => property.id !== propertyToDelete.id
+                        (property: Property): boolean => property.id !== propertyToEdit.id
                     );
                     setProperties(updatedProperties);
                 } else {
@@ -32,15 +34,20 @@ const PropertiesList = () => {
             } catch (error: any) {
                 setError(`Error deleting property: ${error.message}`);
             } finally {
-                setPropertyToDelete(null);
+                setPropertyToEdit(null);
             }
         }
         setIsDialogOpen(false);
     };
 
     const openDeleteDialog = (property: Property): void => {
-        setPropertyToDelete(property);
+        setPropertyToEdit(property);
         setIsDialogOpen(true);
+    };
+
+    const openEditDialog = (property: Property): void => {
+        setPropertyToEdit(property);
+        setIsEditDialogOpen(true);
     };
 
     const columns = [
@@ -61,8 +68,12 @@ const PropertiesList = () => {
             header: "Description",
         },
         {
-            accessorKey: "propertyValue",
-            header: "Value",
+            accessorKey: "price",
+            header: "Price per month",
+            cell: ({ row } : { row: { original: { price: number } } }): string => {
+                const price: number = row.original.price;
+                return `${price} kč`;
+            }
         },
         {
             id: "actions",
@@ -77,9 +88,15 @@ const PropertiesList = () => {
                     onConfirm={handleDelete}
                     onCancel={(): void => setIsDialogOpen(false)}
                     trigger={
-                        <button onClick={(): void => openDeleteDialog(row.original)} className="text-red-600 hover:text-red-800">
-                            Delete
-                        </button>
+                        <div className="flex space-x-4">
+                            <button onClick={(): void => openEditDialog(row.original)} className="text-blue-600 hover:text-blue-800">
+                                Edit
+                            </button>
+                            <button onClick={(): void => openDeleteDialog(row.original)}
+                                    className="text-red-600 hover:text-red-800">
+                                Delete
+                            </button>
+                        </div>
                     }
                 />
             ),
@@ -94,12 +111,24 @@ const PropertiesList = () => {
                     {error}
                 </div>
             )}
+            {isEditDialogOpen && (
+                <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative">
+                        <button onClick={() => setIsEditDialogOpen(false)}
+                                className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none">
+                            ✖
+                        </button>
+                        <h2 className="text-2xl font-bold text-center mb-6">Create new property</h2>
+                        <PropertiesForm setIsOpen={setIsEditDialogOpen} propertyToEdit={propertyToEdit || undefined}/>
+                    </div>
+                </div>
+            )}
 
             <DataTable columns={columns} data={properties} options={{
                 sorting: true,
                 filtering: true,
                 pagination: true,
-            }} />
+            }}/>
         </div>
     );
 };

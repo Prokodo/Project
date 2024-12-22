@@ -52,13 +52,30 @@ public class PropertyServiceImpl implements PropertyService {
         }
     }
 
-    public Property updateProperty(final long id, final @NotNull Property updatedProperty) {
+    private void updatePropertyImage(final @NotNull Property property, final MultipartFile imageFile) {
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
+                property.setImage(imageFile.getBytes());
+            } catch (final IOException e) {
+                throw new RuntimeException("Failed to process the image file", e);
+            }
+        } else {
+            property.setImage(null);
+        }
+    }
+
+    private void updatePropertyDetails(final @NotNull Property property, final Property updatedProperty) {
+        property.setName(updatedProperty.getName());
+        property.setType(updatedProperty.getType());
+        property.setPrice(updatedProperty.getPrice());
+        property.setAddress(updatedProperty.getAddress());
+        property.setDescription(updatedProperty.getDescription());
+    }
+
+    public Property updateProperty(final long id, final @NotNull Property updatedProperty, final MultipartFile imageFile) {
         return propertyRepository.findById(id).map(property -> {
-            property.setName(updatedProperty.getName());
-            property.setType(updatedProperty.getType());
-            property.setPrice(updatedProperty.getPrice());
-            property.setAddress(updatedProperty.getAddress());
-            property.setDescription(updatedProperty.getDescription());
+            updatePropertyDetails(property, updatedProperty);
+            updatePropertyImage(property, imageFile);
             return propertyRepository.save(property);
         }).orElseThrow(() -> new RuntimeException("Property not found with id " + id));
     }

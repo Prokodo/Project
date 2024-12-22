@@ -52,6 +52,23 @@ const PropertiesList = () => {
 
     const columns = [
         {
+            accessorKey: "imageBytes",
+            header: "Image",
+            cell: ({ row }: { row: { original: Property } }) => {
+                if (!row.original.image) {
+                    return (
+                      <div>No image found</div>
+                    );
+                }
+
+                return (
+                    <img className="w-20 h-20 object-cover rounded-md"
+                         alt={row.original.name} title={row.original.name}
+                         src={`data:image/jpeg;base64,${row.original.image}`} />
+                );
+            },
+        },
+        {
             accessorKey: "name",
             header: "Name",
         },

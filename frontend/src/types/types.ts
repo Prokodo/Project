@@ -2,9 +2,10 @@ interface Property {
     id: number;
     name: string;
     type: string;
-    address: string;
-    description: string | undefined;
     price: number;
+    address: string;
+    image: string | undefined;
+    description: string | undefined;
 }
 
 export type { Property };

@@ -11,11 +11,12 @@ import {useProperties} from "@/components/properties/PropertiesContext";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 
 const formSchema = z.object({
-    name: z.string().nonempty("Name is required"),
-    type: z.string().nonempty("Type is required"),
-    address: z.string().nonempty("Address is required"),
+    name: z.string().nonempty("Name is required!"),
+    type: z.string().nonempty("Type is required!"),
+    address: z.string().nonempty("Address is required!"),
     description: z.string().optional(),
-    price: z.number().min(0.1, "Price is required"),
+    price: z.number().min(0.1, "Price is required!"),
+    imageFile: z.any().optional(),
 });
 
 const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, propertyToEdit?: Property }> = ({ setIsOpen, propertyToEdit }) => {
@@ -28,6 +29,7 @@ const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, propert
             address: propertyToEdit?.address || "",
             description: propertyToEdit?.description || "",
             price: propertyToEdit?.price || 0,
+            imageFile: null,
         },
     });
 
@@ -44,9 +46,20 @@ const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, propert
                 }),
             ], { type: "application/json" });
             formData.append("property", propertyBlob);
-            //if (values.imageFile) {
-            //   formData.append("imageFile", values.imageFile);
-            //}
+
+            if (values.imageFile && values.imageFile.length > 0) {
+                formData.append("imageFile", values.imageFile[0]);
+            } else if (propertyToEdit?.image) {
+                const imageBlob = new Blob([
+                    new Uint8Array(Array.from(atob(propertyToEdit.image), char => char.charCodeAt(0)))
+                ], { type: "image/*" });
+                formData.append("imageFile", imageBlob);
+            }
+
+            console.log("FormData content:");
+            for (const [key, value] of formData.entries()) {
+                console.log(`${key}:`, value instanceof Blob ? "Blob/File" : value);
+            }
 
             const url: string = propertyToEdit ? `http://localhost:8080/api/properties/${propertyToEdit.id}` : "http://localhost:8080/api/properties";
             const response = await fetch(url, {
@@ -117,13 +130,24 @@ const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, propert
                         <FormLabel>Price</FormLabel>
                         <FormControl>
                             <Input type="number" placeholder="Property price" {...field} onChange={(e): void => {
-                                const value: number | null = e.target.value === "" ? null : parseFloat(e.target.value);
+                                const value: string | number | null = e.target.value === "" ? "" : parseFloat(e.target.value);
                                 field.onChange(value);
                             }} />
                         </FormControl>
                         <FormMessage/>
                     </FormItem>
                 )}/>
+
+                <FormField control={form.control} name="imageFile" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Image</FormLabel>
+                        <FormControl>
+                            <Input type="file" accept="image/*" onChange={(e) => field.onChange(e.target.files)} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+
                 <Button type="submit">{propertyToEdit ? "Save Changes" : "Create New Property"}</Button>
             </form>
         </Form>

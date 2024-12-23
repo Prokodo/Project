@@ -1,67 +1,46 @@
 package com.backend.security;
 
 import com.backend.service.interfaces.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 
 @Configuration
-@EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
-    private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
+    private final @NotNull UserService userService;
 
-    @Autowired
-    public SecurityConfig(final UserService userService, final PasswordEncoder passwordEncoder) {
+    public SecurityConfig(final @NotNull UserService userService) {
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    @Autowired
-    public void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService).passwordEncoder(passwordEncoder);
     }
 
     @Bean
-    public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
-        /*http.authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
-            )
-            .formLogin(Customizer.withDefaults())
-            /*.formLogin((form) -> form
-                .loginPage("/login") // Custom login page
-                .loginProcessingUrl("/login") // Form submission URL
-                .defaultSuccessUrl("/", true)
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout")
-                .permitAll()
-            )
-            .exceptionHandling((exceptions) -> exceptions.accessDeniedHandler(accessDeniedHandler()));
-*/
+    public SecurityFilterChain filterChain(final @NotNull HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().permitAll()
-                );
+            .cors(Customizer.withDefaults())
+            .authorizeHttpRequests(auth ->
+                auth.requestMatchers("/api/auth/**").permitAll()
+                    .anyRequest().authenticated()
+            )
+            .httpBasic(Customizer.withDefaults());
         return http.build();
     }
 
     @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
-        return (request, response, accessDeniedException) -> {
-            response.sendRedirect("/403");
-        };
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        return http
+            .getSharedObject(AuthenticationManagerBuilder.class)
+            .userDetailsService(userService).passwordEncoder(passwordEncoder()).and().build();
     }
 }

@@ -2,48 +2,45 @@ package com.backend.model;
 
 import com.backend.model.enums.RequestStatus;
 import jakarta.persistence.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "Request")
+@Table(name = "request")
 public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne
+    @JoinColumn(name = "property_id", nullable = false)
     private Property property;
-
-    @ManyToOne(optional = false)
-    private User tenant;
 
     @Column(nullable = false)
     private String description;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private RequestStatus status; // Status: REQUESTED, IN_PROGRESS, COMPLETED, REJECTED
+    @Enumerated(EnumType.STRING)
+    private RequestStatus status;  // Status: REQUESTED, IN_PROGRESS, COMPLETED, REJECTED
 
     @Column(nullable = false)
     private LocalDate requestDate;
 
+    @Column
+    private LocalDate completionDate;
+
     public Request() {}
 
-    public Request(Property property, User tenant, String description, RequestStatus status, LocalDate requestDate) {
-        this.property = property;
-        this.tenant = tenant;
-        this.description = description;
+    public Request(final User tenant, final Property property, final String description, final RequestStatus status, final LocalDate requestDate) {
         this.status = status;
+        this.property = property;
+        this.description = description;
         this.requestDate = requestDate;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public User getTenant() {
-        return tenant;
     }
 
     public Property getProperty() {
@@ -66,23 +63,19 @@ public class Request {
         this.id = id;
     }
 
-    public void setTenant(final User tenant) {
-        this.tenant = tenant;
-    }
-
-    public void setProperty(final Property property) {
+    public void setProperty(final @NotNull Property property) {
         this.property = property;
     }
 
-    public void setStatus(final RequestStatus status) {
+    public void setStatus(final @NotNull RequestStatus status) {
         this.status = status;
     }
 
-    public void setDescription(final String description) {
+    public void setDescription(final @NotNull String description) {
         this.description = description;
     }
 
-    public void setRequestDate(final LocalDate requestDate) {
+    public void setRequestDate(final @NotNull LocalDate requestDate) {
         this.requestDate = requestDate;
     }
 }

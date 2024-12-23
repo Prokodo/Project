@@ -56,11 +56,6 @@ const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, propert
                 formData.append("imageFile", imageBlob);
             }
 
-            console.log("FormData content:");
-            for (const [key, value] of formData.entries()) {
-                console.log(`${key}:`, value instanceof Blob ? "Blob/File" : value);
-            }
-
             const url: string = propertyToEdit ? `http://localhost:8080/api/properties/${propertyToEdit.id}` : "http://localhost:8080/api/properties";
             const response = await fetch(url, {
                 method: propertyToEdit ? "PUT" : "POST",
@@ -72,6 +67,14 @@ const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, propert
                 if (propertyToEdit) editProperty(data);
                 else addProperty(data);
                 setIsOpen(false);
+            } else if (response.status === 400) {
+                const errorData = await response.json();
+                for (const [field, message] of Object.entries(errorData)) {
+                    form.setError(field as keyof z.infer<typeof formSchema>, {
+                        type: "manual",
+                        message: message as string,
+                    });
+                }
             } else {
                 alert("Failed to create property.");
                 console.error("Error:", response.statusText);

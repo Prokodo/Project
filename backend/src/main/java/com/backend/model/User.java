@@ -1,6 +1,5 @@
 package com.backend.model;
 
-import com.backend.model.enums.Role;
 import jakarta.persistence.*;
 
 @Entity

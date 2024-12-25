@@ -33,6 +33,14 @@ const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, propert
         },
     });
 
+    const getCookie = (name) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    };
+
+
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
             const formData = new FormData();
@@ -56,10 +64,16 @@ const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, propert
                 formData.append("imageFile", imageBlob);
             }
 
+            const authToken = getCookie("authToken");
+
             const url: string = propertyToEdit ? `http://localhost:8080/api/properties/${propertyToEdit.id}` : "http://localhost:8080/api/properties";
             const response = await fetch(url, {
                 method: propertyToEdit ? "PUT" : "POST",
                 body: formData,
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+                cache: "no-store",
             });
 
             if (response.ok) {

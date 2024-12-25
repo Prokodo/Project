@@ -27,9 +27,9 @@ public class JwtTokenProvider {
         final Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
         return Jwts.builder()
-                .setSubject(username).claim("roles", authorities)
-                .setIssuedAt(now).setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
+            .setSubject(username).claim("roles", authorities)
+            .setIssuedAt(now).setExpiration(expiryDate)
+            .signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
     }
 
     public String getUsernameFromJWT(final @NotNull String token) {

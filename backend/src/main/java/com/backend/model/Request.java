@@ -13,10 +13,6 @@ public class Request {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "property_id", nullable = false)
-    private Property property;
-
     @Column(nullable = false)
     private String description;
 
@@ -30,9 +26,18 @@ public class Request {
     @Column
     private LocalDate completionDate;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User tenant;
+
+    @ManyToOne
+    @JoinColumn(name = "property_id", nullable = false)
+    private Property property;
+
     public Request() {}
 
     public Request(final User tenant, final Property property, final String description, final RequestStatus status, final LocalDate requestDate) {
+        this.tenant = tenant;
         this.status = status;
         this.property = property;
         this.description = description;

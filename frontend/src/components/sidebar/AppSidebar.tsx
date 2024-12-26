@@ -1,19 +1,16 @@
+import {JSX} from "react";
+import LogOutButton from "@/components/common/LogOutButton";
 import {
     Sidebar, SidebarContent, SidebarFooter,
     SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
     SidebarMenu, SidebarMenuButton, SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import {HouseIcon, LayoutDashboardIcon, HousePlugIcon, GitPullRequestIcon, ReceiptIcon, FileIcon, UserSearchIcon} from "lucide-react";
-import {JSX} from "react";
+import {LayoutDashboardIcon, HousePlugIcon, GitPullRequestIcon, ReceiptIcon, FileIcon, UserSearchIcon} from "lucide-react";
 
 const items = [
     {
         title: "Home",
         url: "/",
-        icon: HouseIcon,
-    }, {
-        title: "Dashboard",
-        url: "/dashboard",
         icon: LayoutDashboardIcon,
     }, {
         title: "Properties",
@@ -60,7 +57,9 @@ export function AppSidebar(): JSX.Element {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
-            <SidebarFooter />
+            <SidebarFooter>
+                <LogOutButton />
+            </SidebarFooter>
         </Sidebar>
     )
 }

@@ -3,7 +3,7 @@ package com.backend.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Users")
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,6 +17,10 @@ public class User {
 
     @Column(nullable = false)
     private String role;
+
+    @ManyToOne
+    @JoinColumn(name = "property_id", nullable = true)
+    private Property property;
 
     public User() {}
 
@@ -42,6 +46,10 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public Property getProperty() {
+        return property;
     }
 
     public void setId(final long id) {

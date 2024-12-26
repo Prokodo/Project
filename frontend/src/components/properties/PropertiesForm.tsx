@@ -9,6 +9,7 @@ import {Dispatch, FC, SetStateAction} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useProperties} from "@/components/properties/PropertiesContext";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {navigate} from "next/dist/client/components/segment-cache/navigation";
 
 const formSchema = z.object({
     name: z.string().nonempty("Name is required!"),
@@ -33,15 +34,16 @@ const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, propert
         },
     });
 
-    const getCookie = (name) => {
+    const getCookie = (name: string): string | null => {
         const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
+        const parts: string[] = value.split(`; ${name}=`);
+        if (parts.length === 2) {
+            return parts.pop()?.split(';').shift() || null;
+        }
         return null;
     };
 
-
-    async function onSubmit(values: z.infer<typeof formSchema>) {
+    async function onSubmit(values: z.infer<typeof formSchema>): Promise<void> {
         try {
             const formData = new FormData();
             const propertyBlob = new Blob([
@@ -64,9 +66,8 @@ const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, propert
                 formData.append("imageFile", imageBlob);
             }
 
-            const authToken = getCookie("authToken");
-
             const url: string = propertyToEdit ? `http://localhost:8080/api/properties/${propertyToEdit.id}` : "http://localhost:8080/api/properties";
+            const authToken: string = getCookie("authToken") || "";
             const response = await fetch(url, {
                 method: propertyToEdit ? "PUT" : "POST",
                 body: formData,

@@ -2,10 +2,11 @@
 
 import React, {useState} from "react";
 import {Property} from "@/types/types";
+import {getCookie} from "@/utils/cookies";
 import {DataTable} from "@/components/properties/DataTable";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
-import {useProperties} from "@/components/properties/PropertiesContext";
 import PropertiesForm from "@/components/properties/PropertiesForm";
+import {useProperties} from "@/components/properties/PropertiesContext";
 
 const PropertiesList = () => {
     const { properties, setProperties } = useProperties();
@@ -18,9 +19,14 @@ const PropertiesList = () => {
     const handleDelete = async (): Promise<void> => {
         if (propertyToEdit) {
             try {
-                const response = await fetch(`http://localhost:8080/api/properties/${propertyToEdit.id}`, {
+                const url: string = `http://localhost:8080/api/properties/${propertyToEdit.id}`;
+                const authToken: string = getCookie("authToken") || "";
+                const response = await fetch(url, {
                     method: "DELETE",
-                    credentials: "include",
+                    headers: {
+                        Authorization: `Bearer ${authToken}`,
+                    },
+                    cache: "no-store",
                 });
 
                 if (response.ok) {

@@ -3,13 +3,13 @@
 import {z} from "zod";
 import {Property} from "@/types/types";
 import {useForm} from "react-hook-form";
+import {getCookie} from "@/utils/cookies";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {Dispatch, FC, SetStateAction} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useProperties} from "@/components/properties/PropertiesContext";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {navigate} from "next/dist/client/components/segment-cache/navigation";
 
 const formSchema = z.object({
     name: z.string().nonempty("Name is required!"),
@@ -33,15 +33,6 @@ const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, propert
             imageFile: null,
         },
     });
-
-    const getCookie = (name: string): string | null => {
-        const value = `; ${document.cookie}`;
-        const parts: string[] = value.split(`; ${name}=`);
-        if (parts.length === 2) {
-            return parts.pop()?.split(';').shift() || null;
-        }
-        return null;
-    };
 
     async function onSubmit(values: z.infer<typeof formSchema>): Promise<void> {
         try {

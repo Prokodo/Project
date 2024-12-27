@@ -52,6 +52,10 @@ public class Request {
         return property;
     }
 
+    public void setTenant(@NotNull final User tenant) {
+        this.tenant = tenant;
+    }
+
     public String getDescription() {
         return description;
     }

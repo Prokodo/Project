@@ -48,9 +48,7 @@ public class User {
         return password;
     }
 
-    public Property getProperty() {
-        return property;
-    }
+
 
     public void setId(final long id) {
         this.id = id;

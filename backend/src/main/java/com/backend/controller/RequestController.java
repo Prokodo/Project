@@ -1,6 +1,8 @@
 package com.backend.controller;
 
 import com.backend.model.Request;
+import com.backend.repository.PropertyRepository;
+import com.backend.repository.UserRepository;
 import com.backend.service.RequestServiceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,36 +14,49 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/requests")
 public class RequestController {
+    private final @NotNull UserRepository userRepository;
     private final @NotNull RequestServiceImpl requestService;
+    private final @NotNull PropertyRepository propertyRepository;
 
     @Autowired
-    public RequestController(final @NotNull RequestServiceImpl requestService) {
+    public RequestController(final @NotNull RequestServiceImpl requestService, final @NotNull UserRepository userRepository, final @NotNull PropertyRepository propertyRepository) {
         this.requestService = requestService;
+        this.userRepository = userRepository;
+        this.propertyRepository = propertyRepository;
     }
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     @GetMapping
     public List<Request> getAllRequests() {
         return requestService.getAllRequests();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Request> getRequestById(final @PathVariable Long id) {
+    @GetMapping("/users/{id}")
+    public ResponseEntity<Request> getRequestByUserId(final @PathVariable Long id) {
         return ResponseEntity.ok(requestService.getRequestById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<Request> createRequest(final @RequestBody Request request) {
+    @GetMapping("/properties/{id}")
+    public ResponseEntity<List<Request>> getRequestsByPropertyId(final @PathVariable Long id) {
+        return ResponseEntity.ok(requestService.getRequestByProperty(id));
+    }
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
+    @PostMapping("/{propertyId}")
+    public ResponseEntity<Request> createRequest(final @PathVariable Long propertyId, final @RequestBody Request request) {
+        request.setProperty(
+            propertyRepository
+                .findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Property not found with ID: " + propertyId))
+        );
+        request.setTenant(userRepository.findByUsername("admin"));
         return ResponseEntity.ok(requestService.createRequest(request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Request> updateRequest(final @PathVariable long id, final @RequestBody Request updatedRequest) {
         return ResponseEntity.ok(requestService.updateRequest(id, updatedRequest));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRequest(final @PathVariable long id) {
-        requestService.deleteRequest(id);
-        return ResponseEntity.noContent().build();
     }
 }

@@ -8,4 +8,14 @@ interface Property {
     description: string | undefined;
 }
 
-export type { Property };
+type RequestStatus = "REQUESTED" | "IN_PROGRESS" | "COMPLETED" | "REJECTED";
+
+interface Request {
+    id: number;
+    description: string;
+    status: RequestStatus;
+    requestDate: string;
+    completionDate?: string;
+}
+
+export type { Property, Request, RequestStatus };

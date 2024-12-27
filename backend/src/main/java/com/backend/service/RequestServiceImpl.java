@@ -26,6 +26,17 @@ public class RequestServiceImpl implements RequestService {
             .orElseThrow(() -> new RuntimeException("Request not found with ID " + id));
     }
 
+    public List<Request> getRequestsByUserId(final long userId) {
+        return requestRepository.findAll();
+    }
+
+    public List<Request> getRequestByProperty(final Long propertyId) {
+        if (propertyId == null) {
+            throw new IllegalArgumentException("Property ID must not be null");
+        }
+        return requestRepository.findByPropertyId(propertyId);
+    }
+
     public Request createRequest(final Request request) {
         return requestRepository.save(request);
     }

@@ -7,6 +7,7 @@ import PropertiesList from "@/components/properties/PropertiesList";
 import PropertyPopupForm from "@/components/properties/PropertyPopupForm";
 import {PropertiesProvider} from "@/components/properties/PropertiesContext";
 import {ReadonlyRequestCookies} from "next/dist/server/web/spec-extension/adapters/request-cookies";
+import RequestsList from "@/components/requests/RequestsList";
 
 export default async function PropertiesPage(): Promise<ReactElement> {
     const cookieStore: ReadonlyRequestCookies = await cookies();
@@ -18,8 +19,7 @@ export default async function PropertiesPage(): Promise<ReactElement> {
     const properties: Property[] = await fetchProperties(authToken) || [];
     return (
         <PropertiesProvider initialProperties={properties}>
-            <PropertyPopupForm />
-            {properties.length > 0 && <PropertiesList />}
+            {properties.length > 0 && <RequestsList />}
         </PropertiesProvider>
     );
 }

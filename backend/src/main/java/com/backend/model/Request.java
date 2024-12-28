@@ -1,8 +1,11 @@
 package com.backend.model;
 
 import com.backend.model.enums.RequestStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
@@ -14,23 +17,30 @@ public class Request {
     private Long id;
 
     @Column(nullable = false)
+    @NotNull(message = "Description cannot be null")
+    @Size(min = 10, max = 255, message = "Description must be between 10 and 255 characters")
     private String description;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private RequestStatus status;  // Status: REQUESTED, IN_PROGRESS, COMPLETED, REJECTED
+    @NotNull(message = "Status cannot be null")
+    private RequestStatus status;
 
     @Column(nullable = false)
+    @PastOrPresent(message = "Request date must be in the past or present")
     private LocalDate requestDate;
 
-    @Column
+    @Column(nullable = true)
+    @PastOrPresent(message = "Completion date must be in the past or present")
     private LocalDate completionDate;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id", nullable = false)
     private User tenant;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;
 
@@ -44,16 +54,10 @@ public class Request {
         this.requestDate = requestDate;
     }
 
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
     public Long getId() {
         return id;
-    }
-
-    public Property getProperty() {
-        return property;
-    }
-
-    public void setTenant(@NotNull final User tenant) {
-        this.tenant = tenant;
     }
 
     public String getDescription() {
@@ -68,23 +72,34 @@ public class Request {
         return requestDate;
     }
 
+    public LocalDate getCompletionDate() {
+        return completionDate;
+    }
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
     public void setId(final long id) {
         this.id = id;
     }
 
-    public void setProperty(final @NotNull Property property) {
+    public void setTenant(final User tenant) {
+        this.tenant = tenant;
+    }
+
+    public void setProperty(final Property property) {
         this.property = property;
     }
 
-    public void setStatus(final @NotNull RequestStatus status) {
+    public void setStatus(final RequestStatus status) {
         this.status = status;
+        if (status == RequestStatus.COMPLETED) {
+            this.completionDate = LocalDate.now();
+        } else {
+            this.completionDate = null;
+        }
     }
 
-    public void setDescription(final @NotNull String description) {
+    public void setDescription(final String description) {
         this.description = description;
-    }
-
-    public void setRequestDate(final @NotNull LocalDate requestDate) {
-        this.requestDate = requestDate;
     }
 }

@@ -9,10 +9,9 @@ import {useProperties} from "@/components/properties/PropertiesContext";
 import {getCookie} from "@/utils/cookies";
 
 const requestSchema = z.object({
-    description: z.string().min(1, "Description is required"),
+    description: z.string().min(10, "Description is required").max(255, "Description is too long"),
     status: z.enum(["REQUESTED", "IN_PROGRESS", "COMPLETED", "REJECTED"]),
     requestDate: z.string().min(1, "Request date is required"),
-    completionDate: z.string().optional(),
 });
 
 type RequestFormProps = {
@@ -21,14 +20,13 @@ type RequestFormProps = {
 };
 
 const RequestsForm: FC<RequestFormProps> = ({ setIsOpen, property }) => {
-    const {  } = useProperties();
+    const { addRequest } = useProperties();
     const form = useForm<z.infer<typeof requestSchema>>({
         resolver: zodResolver(requestSchema),
         defaultValues: {
             description: "",
             status: "REQUESTED",
             requestDate: new Date().toISOString().split("T")[0],
-            completionDate: undefined,
         },
     });
 
@@ -47,7 +45,7 @@ const RequestsForm: FC<RequestFormProps> = ({ setIsOpen, property }) => {
 
             if (response.ok) {
                 const newRequest = await response.json();
-                //addRequest(property.id, newRequest);
+                addRequest(property.id, newRequest);
                 setIsOpen(false);
             } else {
                 alert("Failed to add request.");
@@ -70,42 +68,8 @@ const RequestsForm: FC<RequestFormProps> = ({ setIsOpen, property }) => {
                 )}
             </div>
 
-            <div>
-                <label className="block text-sm font-medium text-gray-700">Status</label>
-                <select {...form.register("status")} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                    <option value="REQUESTED">Requested</option>
-                    <option value="IN_PROGRESS">In Progress</option>
-                    <option value="COMPLETED">Completed</option>
-                    <option value="REJECTED">Rejected</option>
-                </select>
-                {form.formState.errors.status && (
-                    <p className="text-red-500 text-sm">
-                        {form.formState.errors.status.message}
-                    </p>
-                )}
-            </div>
-
-            <div>
-                <label className="block text-sm font-medium text-gray-700">Request Date</label>
-                <input type="date" readOnly value={new Date().toISOString().split("T")[0]}
-                       className="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed"/>
-                {form.formState.errors.requestDate && (
-                    <p className="text-red-500 text-sm">
-                        {form.formState.errors.requestDate.message}
-                    </p>
-                )}
-            </div>
-
-            <div>
-                <label className="block text-sm font-medium text-gray-700">Completion Date</label>
-                <input type="date"{...form.register("completionDate")}
-                       className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"/>
-                {form.formState.errors.completionDate && (
-                    <p className="text-red-500 text-sm">
-                        {form.formState.errors.completionDate.message}
-                    </p>
-                )}
-            </div>
+            <input type="hidden" value={"REQUESTED"} {...form.register("status")} />
+            <input type="hidden" value={new Date().toISOString().split("T")[0]} {...form.register("requestDate")} />
 
             <div className="flex justify-end space-x-4">
                 <button type="button" className="bg-gray-300 px-4 py-2 rounded" onClick={() => setIsOpen(false)}>

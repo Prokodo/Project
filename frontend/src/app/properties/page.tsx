@@ -1,8 +1,9 @@
 import {ReactElement} from "react";
 import {cookies} from "next/headers";
-import {Property} from "@/types/types";
-import {redirect} from "next/navigation";
+import {hasAuthority} from "@/services/global";
 import {fetchProperties} from "@/services/properties";
+import {redirect, unauthorized} from "next/navigation";
+import {AuthorityResponse, Property} from "@/types/types";
 import PropertiesList from "@/components/properties/PropertiesList";
 import PropertyPopupForm from "@/components/properties/PropertyPopupForm";
 import {PropertiesProvider} from "@/components/properties/PropertiesContext";
@@ -13,6 +14,11 @@ export default async function PropertiesPage(): Promise<ReactElement> {
     const authToken: string | undefined = cookieStore.get("authToken")?.value;
     if (!authToken) {
         redirect('/login');
+    }
+
+    const authority: AuthorityResponse | undefined = await hasAuthority(authToken, "ROLE_ADMIN");
+    if (!authority || !authority.authorized) {
+        return unauthorized();
     }
 
     const properties: Property[] = await fetchProperties(authToken) || [];

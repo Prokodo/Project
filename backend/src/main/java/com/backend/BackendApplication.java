@@ -12,7 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @SpringBootApplication
 public class BackendApplication {
 	private UserService userService;
-
 	private PasswordEncoder passwordEncoder;
 
 	@Autowired

@@ -18,24 +18,9 @@ public class SecurityConfig {
     private final @NotNull UserService userService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-
     public SecurityConfig(final @NotNull UserService userService, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.userService = userService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-
-    }
-
-    @Bean
-    public SecurityFilterChain filterChain(final @NotNull HttpSecurity http) throws Exception {
-        http.csrf().disable()
-            .cors(Customizer.withDefaults())
-            .authorizeHttpRequests(auth ->
-                auth.requestMatchers("/api/auth/**").permitAll()
-                    .anyRequest().authenticated()
-            )
-            .httpBasic(Customizer.withDefaults())
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
     }
 
     @Bean
@@ -48,5 +33,18 @@ public class SecurityConfig {
         return http
             .getSharedObject(AuthenticationManagerBuilder.class)
             .userDetailsService(userService).passwordEncoder(passwordEncoder()).and().build();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(final @NotNull HttpSecurity http) throws Exception {
+        http.csrf().disable()
+            .cors(Customizer.withDefaults())
+            .authorizeHttpRequests(auth ->
+                    auth.requestMatchers("/api/auth/**").permitAll()
+                            .anyRequest().authenticated()
+            )
+            .httpBasic(Customizer.withDefaults())
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
     }
 }

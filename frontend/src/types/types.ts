@@ -1,3 +1,5 @@
+import {validRoles} from "@/services/global";
+
 interface Property {
     id: number;
     name: string;
@@ -18,4 +20,10 @@ interface Request {
     completionDate?: string;
 }
 
-export type { Property, Request, RequestStatus };
+type AuthorityResponse = {
+    authorized: boolean;
+    message: string;
+    roles: validRoles[];
+};
+
+export type { Property, Request, RequestStatus, AuthorityResponse };

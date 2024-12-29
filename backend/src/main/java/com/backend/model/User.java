@@ -48,8 +48,6 @@ public class User {
         return password;
     }
 
-
-
     public void setId(final long id) {
         this.id = id;
     }

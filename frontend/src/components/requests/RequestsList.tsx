@@ -5,10 +5,12 @@ import React, {ChangeEvent, JSX, useState} from "react";
 import {useProperties} from "@/components/properties/PropertiesContext";
 import {Property, Request} from "@/types/types";
 import RequestsForm from "@/components/requests/RequestsForm";
+import {validRoles} from "@/services/global";
 
-const RequestsList = (): JSX.Element => {
+const RequestsList = ({ roles=[] }: { roles: validRoles[] }): JSX.Element => {
     const { properties } = useProperties();
 
+    const isAdmin: boolean = roles.includes("ROLE_ADMIN");
     const [isRequestFormOpen, setIsRequestFormOpen] = useState(false);
     const [filterStatus, setFilterStatus] = useState<string | null>(null);
     const [requests, setRequests] = useState<Record<number, Request[]>>({});
@@ -163,15 +165,19 @@ const RequestsList = (): JSX.Element => {
                                                     </div>
                                                 </div>
 
-                                                <select value={request.status} className="ml-4 bg-transparent rerounded"
-                                                        onChange={(e: ChangeEvent<HTMLSelectElement>): Promise<void> =>
-                                                            updateRequestStatus(property.id, request.id, e.target.value)
-                                                        }>
-                                                    <option value="REQUESTED">Requested</option>
-                                                    <option value="IN_PROGRESS">In Progress</option>
-                                                    <option value="COMPLETED">Completed</option>
-                                                    <option value="REJECTED">Rejected</option>
-                                                </select>
+                                                {isAdmin ? (
+                                                    <select value={request.status} className="ml-4 bg-transparent rerounded"
+                                                            onChange={(e: ChangeEvent<HTMLSelectElement>): Promise<void> =>
+                                                                updateRequestStatus(property.id, request.id, e.target.value)
+                                                            }>
+                                                        <option value="REQUESTED">Requested</option>
+                                                        <option value="IN_PROGRESS">In Progress</option>
+                                                        <option value="COMPLETED">Completed</option>
+                                                        <option value="REJECTED">Rejected</option>
+                                                    </select>
+                                                ) : (
+                                                    <span>{request.status}</span>
+                                                )}
                                             </li>
                                         ))}
                                     </ul>

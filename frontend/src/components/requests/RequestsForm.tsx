@@ -59,8 +59,7 @@ const RequestsForm: FC<RequestFormProps> = ({ setIsOpen, property }) => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div>
                 <label className="block text-sm font-medium text-gray-700">Description</label>
-                <textarea{...form.register("description")}
-                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
+                <textarea {...form.register("description")} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
                 {form.formState.errors.description && (
                     <p className="text-red-500 text-sm">
                         {form.formState.errors.description.message}

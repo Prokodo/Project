@@ -1,11 +1,9 @@
 import {ReactElement} from "react";
 import {cookies} from "next/headers";
 import {hasAuthority} from "@/services/global";
-import {fetchProperties} from "@/services/properties";
+import {AuthorityResponse} from "@/types/types";
 import {redirect, unauthorized} from "next/navigation";
-import {AuthorityResponse, Property} from "@/types/types";
-import RequestsList from "@/components/requests/RequestsList";
-import {PropertiesProvider} from "@/components/properties/PropertiesContext";
+import RegistrationForm from "@/components/auth/RegistrationForm";
 import {ReadonlyRequestCookies} from "next/dist/server/web/spec-extension/adapters/request-cookies";
 
 export default async function PropertiesPage(): Promise<ReactElement> {
@@ -15,15 +13,12 @@ export default async function PropertiesPage(): Promise<ReactElement> {
         redirect('/login');
     }
 
-    const authority: AuthorityResponse | undefined = await hasAuthority(authToken, "ROLE_ADMIN");
+    const authority: AuthorityResponse | undefined = await hasAuthority(authToken, "ROLE_USER");
     if (!authority) {
         return unauthorized();
     }
 
-    const properties: Property[] = await fetchProperties(authToken) || [];
     return (
-        <PropertiesProvider initialProperties={properties}>
-            {properties.length > 0 && <RequestsList roles={authority.roles} />}
-        </PropertiesProvider>
+        <RegistrationForm />
     );
 }

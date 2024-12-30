@@ -2,6 +2,9 @@ package com.backend.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -18,9 +21,8 @@ public class User {
     @Column(nullable = false)
     private String role;
 
-    @ManyToOne
-    @JoinColumn(name = "property_id", nullable = true)
-    private Property property;
+    @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Contract> contracts = new ArrayList<>();
 
     public User() {}
 
@@ -47,6 +49,12 @@ public class User {
     public String getPassword() {
         return password;
     }
+
+    public List<Contract> getContracts() {
+        return contracts;
+    }
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     public void setId(final long id) {
         this.id = id;

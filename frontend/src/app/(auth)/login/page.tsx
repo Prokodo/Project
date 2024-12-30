@@ -16,7 +16,8 @@ export default function LoginPage(): JSX.Element {
         setError("");
 
         try {
-            const response = await fetch("http://localhost:8080/api/auth/login", {
+            const url: string = "http://localhost:8080/api/auth/login";
+            const response = await fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password }),
@@ -33,7 +34,7 @@ export default function LoginPage(): JSX.Element {
                 router.push("/");
             } else {
                 const errorRes: any = await response.json();
-                setError(errorRes.error || "Login failed");
+                setError(errorRes.message || "Login failed");
             }
         } catch (err: any) {
             setError("Something went wrong. Please try again.");

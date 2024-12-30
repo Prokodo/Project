@@ -1,21 +1,28 @@
 package com.backend.service;
 
 import com.backend.model.User;
+import com.backend.model.enums.Role;
 import com.backend.repository.UserRepository;
 import com.backend.service.interfaces.UserService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class UserServiceImpl implements UserService {
+    private final PasswordEncoder passwordEncoder;
     private final @NotNull UserRepository userRepository;
 
     @Autowired
-    public UserServiceImpl(final @NotNull UserRepository userRepository) {
+    public UserServiceImpl(final @NotNull UserRepository userRepository, final @NotNull PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -25,16 +32,31 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByUsername(final @NotNull String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
     }
 
     @Override
     public UserDetails loadUserByUsername(final @NotNull String username) throws UsernameNotFoundException {
-        final User user = userRepository.findByUsername(username);
+        final User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+
         return org.springframework.security.core.userdetails.User
             .withUsername(user.getUsername())
             .password(user.getPassword())
             .roles(user.getRole())
             .build();
+    }
+
+    public void registerUser(final @NotNull String username, final @NotNull String password, final @NotNull String role) {
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+
+        if (Stream.of(Role.values()).noneMatch(r -> r.name().equalsIgnoreCase(role))) {
+            final String allowedRoles = Stream.of(Role.values()).map(Enum::name).collect(Collectors.joining(", "));
+            throw new IllegalArgumentException("Invalid role. Allowed roles are: " + allowedRoles);
+        }
+        userRepository.save(new User(username, passwordEncoder.encode(password), role.toUpperCase()));
     }
 }

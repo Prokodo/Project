@@ -50,7 +50,7 @@ public class RequestController {
             propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new RuntimeException("Property not found with ID: " + propertyId))
         );
-        request.setTenant(userRepository.findByUsername("admin"));
+        request.setTenant(userRepository.findByUsername("admin").get());
         return ResponseEntity.ok(requestService.createRequest(request));
     }
 

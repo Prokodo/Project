@@ -1,7 +1,12 @@
 package com.backend.controller;
 
+import com.backend.model.User;
+import com.backend.model.enums.Role;
+import com.backend.repository.UserRepository;
 import com.backend.security.AuthRequest;
 import com.backend.security.JwtTokenProvider;
+import com.backend.security.RegisterRequest;
+import com.backend.service.interfaces.UserService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,21 +16,23 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+    private final @NotNull UserService userService;
     private final @NotNull JwtTokenProvider jwtTokenProvider;
     private final @NotNull AuthenticationManager authenticationManager;
 
     @Autowired
-    public AuthController(final @NotNull AuthenticationManager authenticationManager, final @NotNull JwtTokenProvider jwtTokenProvider) {
+    public AuthController(final @NotNull UserService userService, final @NotNull AuthenticationManager authenticationManager, final @NotNull JwtTokenProvider jwtTokenProvider) {
+        this.userService = userService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
     }
@@ -37,6 +44,21 @@ public class AuthController {
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return ResponseEntity.ok(Map.of("token", jwtTokenProvider.generateToken(authentication)));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(final @RequestBody RegisterRequest request) {
+        try {
+            userService.registerUser(request.getUsername(), request.getPassword(), request.getRole());
+            return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(Map.of("message", "User registered successfully"));
+        }
+        catch (final IllegalArgumentException exception) {
+            return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", exception.getMessage()));
+        }
     }
 
     @GetMapping("/has-authority")

@@ -10,12 +10,6 @@ public class Contract {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(optional = false)
-    private Property property;
-
-    @ManyToOne(optional = false)
-    private User tenant;
-
     @Column(nullable = false)
     private LocalDate startDate;
 
@@ -24,6 +18,14 @@ public class Contract {
 
     @Column(nullable = false)
     private double monthlyRent;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "tenant_id", nullable = false)
+    private User tenant;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "property_id", nullable = false)
+    private Property property;
 
     public Contract() {}
 

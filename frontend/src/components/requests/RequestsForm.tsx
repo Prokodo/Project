@@ -3,10 +3,10 @@
 import { z } from "zod";
 import {Property} from "@/types/types";
 import { useForm } from "react-hook-form";
+import {getCookie} from "@/utils/cookies";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { FC, Dispatch, SetStateAction } from "react";
 import {useProperties} from "@/components/properties/PropertiesContext";
-import {getCookie} from "@/utils/cookies";
 
 const requestSchema = z.object({
     description: z.string().min(10, "Description is required").max(255, "Description is too long"),

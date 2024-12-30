@@ -39,7 +39,7 @@ public class Property {
     private String description;
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<User> tenants = new ArrayList<>();
+    private List<Contract> contracts = new ArrayList<>();
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Request> requests = new ArrayList<>();

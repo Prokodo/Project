@@ -1,8 +1,5 @@
 package com.backend.controller;
 
-import com.backend.model.User;
-import com.backend.model.enums.Role;
-import com.backend.repository.UserRepository;
 import com.backend.security.AuthRequest;
 import com.backend.security.JwtTokenProvider;
 import com.backend.security.RegisterRequest;
@@ -16,12 +13,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -61,14 +55,32 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/roles")
+    public ResponseEntity<?> isLoggedIn() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                "roles", new ArrayList<>(),
+                "loggedIn", false
+            ));
+        }
+
+        final List<String> roles = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
+        return ResponseEntity.ok(Map.of(
+            "loggedIn", true,
+            "roles", roles
+        ));
+    }
+
     @GetMapping("/has-authority")
     public ResponseEntity<?> hasAuthority(final @RequestParam("authority") String authority) {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
                 "message", "User is not authenticated",
+                "roles", new ArrayList<>(),
                 "authorized", false,
-                "roles", new ArrayList<>()
+                "loggedIn", false
             ));
         }
 
@@ -77,6 +89,7 @@ public class AuthController {
         return ResponseEntity.ok(Map.of(
             "message", hasAuthority ? "User has the required authority" : "User does not have the required authority",
             "authorized", hasAuthority,
+            "loggedIn", true,
             "roles", roles
         ));
     }

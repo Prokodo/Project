@@ -1,5 +1,7 @@
-import {JSX} from "react";
-import LogOutButton from "@/components/common/LogOutButton";
+import {getAuthToken} from "@/utils/auth";
+import {RolesResponse} from "@/types/types";
+import {getUserRoles} from "@/services/global";
+import LogOutAlert from "@/components/auth/LogOutAlert";
 import {
     Sidebar, SidebarContent, SidebarFooter,
     SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -12,30 +14,42 @@ const items = [
         title: "Home",
         url: "/",
         icon: LayoutDashboardIcon,
+        adminOnly: false
     }, {
         title: "Properties",
         url: "/properties",
         icon: HousePlugIcon,
+        adminOnly: true
     }, {
         title: "Requests",
         url: "/requests",
         icon: GitPullRequestIcon,
+        adminOnly: false
     }, {
         title: "Contracts",
         url: "/contracts",
         icon: ReceiptIcon,
+        adminOnly: false
     }, {
         title: "Invoices",
         url: "/invoices",
         icon: FileIcon,
+        adminOnly: false
     }, {
         title: "Tenants",
         url: "/tenants",
         icon: UserSearchIcon,
+        adminOnly: true
     },
 ];
 
-export function AppSidebar(): JSX.Element {
+export async function AppSidebar() {
+    const response: RolesResponse | undefined = await getUserRoles(await getAuthToken());
+    const isAdmin: boolean = response?.roles?.includes("ROLE_ADMIN") || false;
+    if (!response?.loggedIn) {
+        return <></>;
+    }
+
     return (
         <Sidebar>
             <SidebarContent>
@@ -43,7 +57,7 @@ export function AppSidebar(): JSX.Element {
                     <SidebarGroupLabel>Application</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {items.map((item) => (
+                            {items.filter(item => isAdmin || !item.adminOnly).map((item) => (
                                 <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton asChild>
                                         <a href={item.url}>
@@ -58,7 +72,7 @@ export function AppSidebar(): JSX.Element {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
-                <LogOutButton />
+                <LogOutAlert />
             </SidebarFooter>
         </Sidebar>
     )

@@ -3,20 +3,16 @@
 import {JSX} from "react";
 import Cookies from "js-cookie";
 import {LogOutIcon} from "lucide-react";
-import {useRouter} from "next/navigation";
-import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {
     AlertDialog, AlertDialogAction, AlertDialogCancel,
     AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
     AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
 
-const LogOutButton = ({}): JSX.Element => {
-    const router: AppRouterInstance = useRouter();
-
+const LogOutAlert = ({}): JSX.Element => {
     const handleLogout = (): void => {
         Cookies.remove("authToken");
-        router.push("/login");
+        window.location.href = "/login";
     };
 
     return (
@@ -55,4 +51,4 @@ const LogOutButton = ({}): JSX.Element => {
     );
 };
 
-export default LogOutButton;
+export default LogOutAlert;

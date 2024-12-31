@@ -20,10 +20,15 @@ interface Request {
     completionDate?: string;
 }
 
+type RolesResponse = {
+    roles: string[];
+    loggedIn: boolean;
+};
+
 type AuthorityResponse = {
     authorized: boolean;
     message: string;
     roles: validRoles[];
 };
 
-export type { Property, Request, RequestStatus, AuthorityResponse };
+export type { Property, Request, RequestStatus, AuthorityResponse, RolesResponse };

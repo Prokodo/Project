@@ -21,15 +21,31 @@ public class User {
     @Column(nullable = false)
     private String role;
 
+    @Column(nullable = false)
+    private String firstName;
+
+    @Column(nullable = false)
+    private String surname;
+
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String phoneNumber;
+
     @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Contract> contracts = new ArrayList<>();
+    private final List<Contract> contracts = new ArrayList<>();
 
     public User() {}
 
-    public User(final String username, final String password, final String role) {
+    public User(final String username, final String password, final String firstName, final String surname, final String email, final String phoneNumber, final String role) {
         this.role = role;
+        this.email = email;
+        this.surname = surname;
         this.username = username;
         this.password = password;
+        this.firstName = firstName;
+        this.phoneNumber = phoneNumber;
     }
 
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
@@ -42,12 +58,28 @@ public class User {
         return role;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
     public String getUsername() {
         return username;
     }
 
     public String getPassword() {
         return password;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
     public List<Contract> getContracts() {

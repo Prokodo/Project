@@ -147,12 +147,7 @@ const PropertiesList = () => {
                     </div>
                 </div>
             )}
-
-            <DataTable columns={columns} data={properties} options={{
-                sorting: true,
-                filtering: true,
-                pagination: true,
-            }}/>
+            <DataTable columns={columns} data={properties} />
         </div>
     );
 };

@@ -21,9 +21,8 @@ public class BackendApplication {
 	public CommandLineRunner demo() {
 		return (args) -> {
 			try {
-				userService.registerUser("admin", "heslo", "ADMIN");
-				userService.registerUser("user", "heslo", "TENANT");
-				userService.registerUser("user22", "heslo", "TENANT");
+				userService.registerUser("admin", "heslo", "Dominik", "Prokop", "email@gmail.com", "+429787787777", "ADMIN");
+				userService.registerUser("user", "heslo", "Dominik", "Prokop", "email@gmail.com", "+429787787777", "TENANT");
 			} catch (final IllegalArgumentException exception) {
 				System.out.println("Error during user registration: " + exception.getMessage());
 			}

@@ -1,10 +1,10 @@
 "use client"
 
 import { z } from "zod";
+import {FC} from "react";
 import {useForm} from "react-hook-form";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
-import {Dispatch, FC, SetStateAction} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 
@@ -12,6 +12,10 @@ const registrationSchema = z.object({
     username: z.string().nonempty("Username is required!"),
     password: z.string().min(6, "Password must be at least 6 characters!"),
     role: z.enum(["ADMIN", "TENANT"], { required_error: "Role is required!" }),
+    firstName: z.string().nonempty("First name is required!"),
+    surname: z.string().nonempty("Second name is required!"),
+    email: z.string().email("Invalid email address!"),
+    phoneNumber: z.string().regex(/^\d{10}$/, "Phone number must be 10 digits!"),
 });
 
 const RegistrationForm: FC = () => {
@@ -20,13 +24,18 @@ const RegistrationForm: FC = () => {
         defaultValues: {
             username: "",
             password: "",
-            role: "TENANT", // Default role
+            role: "TENANT",
+            firstName: "",
+            surname: "",
+            email: "",
+            phoneNumber: "",
         },
     });
 
     async function onSubmit(values: z.infer<typeof registrationSchema>): Promise<void> {
         try {
-            const response = await fetch("http://localhost:8080/api/auth/register", {
+            const url: string = "http://localhost:8080/api/auth/register";
+            const response = await fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -76,6 +85,50 @@ const RegistrationForm: FC = () => {
                         <FormMessage />
                     </FormItem>
                 )} />
+
+                <FormField control={form.control} name="firstName" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>First Name</FormLabel>
+                        <FormControl>
+                            <Input placeholder="Enter first name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+
+                <FormField control={form.control} name="surname" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Surname</FormLabel>
+                        <FormControl>
+                            <Input placeholder="Enter surname" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+
+                <FormField control={form.control} name="email" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                            <Input type="email" placeholder="Enter email" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+
+                <FormField
+                    control={form.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Phone Number</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Enter phone number" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
                 <FormField control={form.control} name="role" render={({ field }) => (
                     <FormItem>

@@ -31,4 +31,13 @@ type AuthorityResponse = {
     roles: validRoles[];
 };
 
-export type { Property, Request, RequestStatus, AuthorityResponse, RolesResponse };
+interface Tenant {
+    id: number;
+    email: string;
+    username: string;
+    lastname: string;
+    firstname: string;
+    phoneNumber: string;
+}
+
+export type { Property, Request, RequestStatus, AuthorityResponse, RolesResponse, Tenant };

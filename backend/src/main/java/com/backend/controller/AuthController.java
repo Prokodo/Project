@@ -40,21 +40,6 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("token", jwtTokenProvider.generateToken(authentication)));
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(final @RequestBody RegisterRequest registerRequest) {
-        try {
-            userService.registerUser(registerRequest);
-            return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(Map.of("message", "User registered successfully"));
-        }
-        catch (final IllegalArgumentException exception) {
-            return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("message", exception.getMessage()));
-        }
-    }
-
     @GetMapping("/roles")
     public ResponseEntity<?> isLoggedIn() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

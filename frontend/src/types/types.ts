@@ -35,8 +35,8 @@ interface Tenant {
     id: number;
     email: string;
     username: string;
-    lastname: string;
-    firstname: string;
+    surname: string;
+    firstName: string;
     phoneNumber: string;
 }
 

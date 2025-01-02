@@ -1,4 +1,4 @@
-package com.backend.handlers;
+package com.backend.errors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

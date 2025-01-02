@@ -3,7 +3,7 @@
 import React, {useState} from "react";
 import {Property} from "@/types/types";
 import {getCookie} from "@/utils/cookies";
-import {DataTable} from "@/components/properties/DataTable";
+import {DataTable} from "@/components/common/DataTable";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import PropertiesForm from "@/components/properties/PropertiesForm";
 import {useProperties} from "@/components/properties/PropertiesContext";

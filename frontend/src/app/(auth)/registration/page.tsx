@@ -3,7 +3,7 @@ import {cookies} from "next/headers";
 import {hasAuthority} from "@/services/global";
 import {AuthorityResponse} from "@/types/types";
 import {redirect, unauthorized} from "next/navigation";
-import RegistrationForm from "@/components/auth/RegistrationForm";
+import TenantsRegistrationForm from "@/components/tenants/TenantsRegistrationForm";
 import {ReadonlyRequestCookies} from "next/dist/server/web/spec-extension/adapters/request-cookies";
 
 export default async function PropertiesPage(): Promise<ReactElement> {
@@ -19,6 +19,6 @@ export default async function PropertiesPage(): Promise<ReactElement> {
     }
 
     return (
-        <RegistrationForm />
+        <TenantsRegistrationForm />
     );
 }

@@ -1,5 +1,6 @@
 package com.backend.service;
 
+import com.backend.errors.UserNotFoundException;
 import com.backend.model.User;
 import com.backend.model.enums.Role;
 import com.backend.repository.UserRepository;
@@ -35,7 +36,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByUsername(final @NotNull String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+            .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+    }
+
+    @Override
+    public void deleteUserById(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException("User with ID " + id + " not found");
+        }
+        userRepository.deleteById(id);
     }
 
     @Override
@@ -55,15 +64,32 @@ public class UserServiceImpl implements UserService {
             .build();
     }
 
-    public void registerUser(final @NotNull RegisterRequest registerRequest) {
-        registerUser(
+    public User updateUser(long id, RegisterRequest registerRequest) {
+        // Find the user by ID
+        User existingUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found"));
+
+        // Update fields based on the RegisterRequest
+        existingUser.setUsername(registerRequest.getUsername());
+        existingUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        existingUser.setRole(registerRequest.getRole());
+        existingUser.setFirstName(registerRequest.getFirstName());
+        existingUser.setSurname(registerRequest.getSurname());
+        existingUser.setEmail(registerRequest.getEmail());
+        existingUser.setPhoneNumber(registerRequest.getPhoneNumber());
+
+        // Save the updated user to the database
+        return userRepository.save(existingUser);
+    }
+
+    public User registerUser(final @NotNull RegisterRequest registerRequest) {
+        return registerUser(
             registerRequest.getUsername(), registerRequest.getPassword(), registerRequest.getFirstName(),
             registerRequest.getSurname(), registerRequest.getEmail(), registerRequest.getPhoneNumber(),
             registerRequest.getRole()
         );
     }
 
-    public void registerUser(
+    public User registerUser(
         final @NotNull String username, final @NotNull String password, final @NotNull String firstName,
         final @NotNull String surname, final @NotNull String email, final @NotNull String phoneNumber, final @NotNull String role
     ) {
@@ -75,6 +101,9 @@ public class UserServiceImpl implements UserService {
             final String allowedRoles = Stream.of(Role.values()).map(Enum::name).collect(Collectors.joining(", "));
             throw new IllegalArgumentException("Invalid role. Allowed roles are: " + allowedRoles);
         }
-        userRepository.save(new User(username, passwordEncoder.encode(password), firstName, surname, email, phoneNumber, role.toUpperCase()));
+
+        final User user = new User(username, passwordEncoder.encode(password), firstName, surname, email, phoneNumber, role.toUpperCase());
+        userRepository.save(user);
+        return user;
     }
 }

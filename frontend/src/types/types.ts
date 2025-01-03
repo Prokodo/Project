@@ -40,4 +40,13 @@ interface Tenant {
     phoneNumber: string;
 }
 
-export type { Property, Request, RequestStatus, AuthorityResponse, RolesResponse, Tenant };
+interface Contract {
+    id: number;
+    startDate: string;
+    endDate: string;
+    monthlyRent: number;
+    tenant: Tenant;
+    property: Property;
+}
+
+export type { Property, Request, RequestStatus, AuthorityResponse, RolesResponse, Tenant, Contract };

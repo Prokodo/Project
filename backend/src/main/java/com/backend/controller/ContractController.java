@@ -1,6 +1,7 @@
 package com.backend.controller;
 
 import com.backend.model.Contract;
+import com.backend.model.requests.ContractRequest;
 import com.backend.service.ContractServiceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class ContractController {
     }
 
     @PostMapping
-    public ResponseEntity<Contract> createContract(final @RequestBody Contract contract) {
+    public ResponseEntity<Contract> createContract(final @RequestBody ContractRequest contract) {
         return ResponseEntity.ok(contractService.createContract(contract));
     }
 

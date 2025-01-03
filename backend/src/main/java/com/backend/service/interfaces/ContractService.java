@@ -1,6 +1,7 @@
 package com.backend.service.interfaces;
 
 import com.backend.model.Contract;
+import com.backend.model.requests.ContractRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,6 +11,6 @@ public interface ContractService {
     void deleteContract(long id);
     List<Contract> getAllContracts();
     Contract getContractById(long id);
-    Contract createContract(Contract contract);
+    Contract createContract(ContractRequest contract);
     Contract updateContract(long id, Contract updatedContract);
 }

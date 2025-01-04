@@ -64,13 +64,18 @@ public class ContractServiceImpl implements ContractService {
         return contractRepository.save(contract);
     }
 
-    public Contract updateContract(final long id, final Contract updatedContract) {
+    public Contract updateContract(final long id, final ContractRequest request) {
         Contract contract = getContractById(id);
-        contract.setProperty(updatedContract.getProperty());
-        contract.setTenant(updatedContract.getTenant());
-        contract.setStartDate(updatedContract.getStartDate());
-        contract.setEndDate(updatedContract.getEndDate());
-        contract.setMonthlyRent(updatedContract.getMonthlyRent());
+
+        Property property = propertyRepository.findById(request.propertyId()).orElseThrow(() -> new IllegalArgumentException("Property not found with ID: " + request.propertyId()));
+
+        User tenant = userRepository.findById(request.tenantId()).orElseThrow(() -> new IllegalArgumentException("Tenant not found with ID: " + request.tenantId()));
+
+        contract.setProperty(property);
+        contract.setTenant(tenant);
+        contract.setStartDate(request.startDate());
+        contract.setEndDate(request.endDate());
+        contract.setMonthlyRent(request.monthlyRent());
         return contractRepository.save(contract);
     }
 }

@@ -129,7 +129,6 @@ const TenantsList = () => {
                     </div>
                 </div>
             )}
-
             <DataTable columns={columns} data={tenants} />
         </div>
     );

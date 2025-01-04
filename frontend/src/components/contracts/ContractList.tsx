@@ -1,11 +1,11 @@
 "use client"
 
-
+import React, {useState} from "react";
+import {Contract, Tenant} from "@/types/types";
+import {getCookie} from "@/utils/cookies";
 import {DataTable} from "@/components/common/DataTable";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
-import {Contract} from "@/types/types";
-import {useEffect, useState} from "react";
-import {getCookie} from "@/utils/cookies";
+import ContractForm from "@/components/contracts/ContractsForm";
 import {useContracts} from "@/components/contracts/ContractContext";
 
 const ContractList = () => {
@@ -13,14 +13,24 @@ const ContractList = () => {
 
     const [error, setError] = useState<string | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-    const [contractToDelete, setContractToDelete] = useState<Contract | null>(null);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
+    const [contractToEdit, setContractToEdit] = useState<Contract | undefined>(null);
 
+    const openEditDialog = (contract: Contract): void => {
+        setContractToEdit(contract);
+        setIsEditDialogOpen(true);
+    };
+
+    const openDeleteDialog = (contract: Contract): void => {
+        setContractToEdit(contract);
+        setIsDialogOpen(true);
+    };
 
     const handleDelete = async () => {
-        if (contractToDelete) {
+        if (contractToEdit) {
             try {
                 const authToken = getCookie("authToken") || "";
-                const url = `http://localhost:8080/api/contracts/${contractToDelete.id}`;
+                const url = `http://localhost:8080/api/contracts/${contractToEdit.id}`;
                 const response = await fetch(url, {
                     method: "DELETE",
                     headers: {
@@ -29,8 +39,8 @@ const ContractList = () => {
                 });
 
                 if (response.ok) {
-                    setContracts((prevContracts) =>
-                        prevContracts.filter((contract) => contract.id !== contractToDelete.id)
+                    setContracts(
+                        (prevContracts: Contract[]): Contract[] => prevContracts.filter((contract: Contract): boolean => contract.id !== contractToEdit.id)
                     );
                 } else {
                     setError(`Failed to delete contract: ${response.statusText}`);
@@ -38,15 +48,10 @@ const ContractList = () => {
             } catch (error: any) {
                 setError(`Error deleting contract: ${error.message}`);
             } finally {
-                setContractToDelete(null);
+                setContractToEdit(null);
             }
         }
         setIsDialogOpen(false);
-    };
-
-    const openDeleteDialog = (contract: Contract) => {
-        setContractToDelete(contract);
-        setIsDialogOpen(true);
     };
 
     const columns = [
@@ -55,31 +60,41 @@ const ContractList = () => {
         { accessorKey: "endDate", header: "End Date" },
         { accessorKey: "monthlyRent", header: "Monthly Rent (Kč)" },
         {
-            accessorKey: "tenant",
-            header: "Tenant",
+            accessorKey: "tenant", header: "Tenant",
             cell: ({ row }: { row: { original: Contract } }) => (
                 <span>{`${row.original.tenant.firstName} ${row.original.tenant.surname}`}</span>
             ),
         },
         {
-            accessorKey: "property",
-            header: "Property",
+            accessorKey: "property", header: "Property",
             cell: ({ row }: { row: { original: Contract } }) => (
                 <span>{row.original.property.name}</span>
             ),
         },
         {
-            id: "actions",
-            header: "Actions",
-            cell: ({ row }: { row: { original: Contract } }) => (
-                <button
-                    onClick={() => openDeleteDialog(row.original)}
-                    className="text-red-600 hover:text-red-800"
-                >
-                    Delete
-                </button>
+            id: "actions", header: "Actions",
+            cell: ({row}: { row: { original: Contract } }) => (
+                <ConfirmDialog
+                    title="Are you sure?"
+                    description="This action cannot be undone. It will permanently delete the property."
+                    confirmLabel="Delete"
+                    cancelLabel="Cancel"
+                    isOpen={isDialogOpen}
+                    onConfirm={handleDelete}
+                    onCancel={(): void => setIsDialogOpen(false)}
+                    trigger={
+                        <div className="flex space-x-4">
+                            <button onClick={(): void => openEditDialog(row.original)} className="text-blue-600 hover:text-blue-800">
+                                Edit
+                            </button>
+                            <button onClick={(): void => openDeleteDialog(row.original)} className="text-red-600 hover:text-red-800">
+                                Delete
+                            </button>
+                        </div>
+                    }
+                />
             ),
-        },
+        }
     ];
 
     return (
@@ -90,16 +105,27 @@ const ContractList = () => {
                     {error}
                 </div>
             )}
+            {isEditDialogOpen && (
+                <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative">
+                        <button onClick={() => setIsEditDialogOpen(false)}
+                                className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none">
+                            ✖
+                        </button>
+                        <h2 className="text-2xl font-bold text-center mb-6">Create new property</h2>
+                        <ContractForm setIsOpen={setIsEditDialogOpen} contractToEdit={contractToEdit} />
+                    </div>
+                </div>
+            )}
+
             <DataTable columns={columns} data={contracts} />
-            <ConfirmDialog
-                title="Are you sure?"
-                description="This action cannot be undone. It will permanently delete the contract."
-                confirmLabel="Delete"
-                cancelLabel="Cancel"
-                isOpen={isDialogOpen}
-                onConfirm={handleDelete}
-                onCancel={() => setIsDialogOpen(false)}
-            />
+            <ConfirmDialog title="Are you sure?"
+                           confirmLabel="Delete"
+                           cancelLabel="Cancel"
+                           description="This action cannot be undone. It will permanently delete the contract."
+                           isOpen={isDialogOpen}
+                           onConfirm={handleDelete}
+                           onCancel={() => setIsDialogOpen(false)} />
         </div>
     );
 };

@@ -12,7 +12,7 @@ interface DialogProps {
     isOpen: boolean;
     onConfirm: () => void;
     onCancel: () => void;
-    trigger: React.ReactNode;
+    trigger?: React.ReactNode;
 }
 
 const ConfirmDialog: React.FC<DialogProps> = ({

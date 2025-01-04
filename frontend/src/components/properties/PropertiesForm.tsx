@@ -6,7 +6,7 @@ import {useForm} from "react-hook-form";
 import {getCookie} from "@/utils/cookies";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
-import {Dispatch, FC, SetStateAction} from "react";
+import {Dispatch, FC, SetStateAction, useState} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useProperties} from "@/components/properties/PropertiesContext";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
@@ -22,6 +22,8 @@ const formSchema = z.object({
 
 const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, propertyToEdit?: Property }> = ({ setIsOpen, propertyToEdit }) => {
     const { addProperty, editProperty } = useProperties();
+    const [generalError, setGeneralError] = useState<string | null>(null);
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -82,17 +84,27 @@ const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, propert
                     });
                 }
             } else {
-                alert("Failed to create property.");
-                console.error("Error:", response.statusText);
+                const errorData = await response.json();
+                if (typeof errorData === 'object') {
+                    for (const [field, message] of Object.entries(errorData)) {
+                        form.setError(field as keyof z.infer<typeof formSchema>, {
+                            type: "manual",
+                            message: message as string,
+                        });
+                    }
+                } else {
+                    setGeneralError(errorData);
+                }
             }
         } catch (error) {
-            alert("An error occurred while creating the property.");
-            console.error("Error:", error);
+            setGeneralError("An unexpected error occurred. Please try again.");
         }
     }
 
     return (
         <Form {...form}>
+            {generalError && <div className="text-red-600">{generalError}</div>}
+
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField control={form.control} name="name" render={({field}) => (
                     <FormItem>

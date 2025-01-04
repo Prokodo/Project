@@ -12,5 +12,5 @@ public interface ContractService {
     List<Contract> getAllContracts();
     Contract getContractById(long id);
     Contract createContract(ContractRequest contract);
-    Contract updateContract(long id, Contract updatedContract);
+    Contract updateContract(long id, ContractRequest updatedContract);
 }

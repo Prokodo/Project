@@ -42,7 +42,7 @@ public class ContractController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Contract> updateContract(final @PathVariable long id, final @RequestBody Contract updatedContract) {
+    public ResponseEntity<Contract> updateContract(final @PathVariable long id, final @RequestBody ContractRequest updatedContract) {
         return ResponseEntity.ok(contractService.updateContract(id, updatedContract));
     }
 }

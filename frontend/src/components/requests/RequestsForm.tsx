@@ -2,9 +2,9 @@
 
 import { z } from "zod";
 import {Property} from "@/types/types";
-import { useForm } from "react-hook-form";
+import {useForm} from "react-hook-form";
 import {getCookie} from "@/utils/cookies";
-import { zodResolver } from "@hookform/resolvers/zod";
+import {zodResolver} from "@hookform/resolvers/zod";
 import React, { FC, Dispatch, SetStateAction } from "react";
 import {useProperties} from "@/components/properties/PropertiesContext";
 

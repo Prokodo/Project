@@ -113,7 +113,8 @@ const PropertiesList = () => {
                     onCancel={(): void => setIsDialogOpen(false)}
                     trigger={
                         <div className="flex space-x-4">
-                            <button onClick={(): void => openEditDialog(row.original)} className="text-blue-600 hover:text-blue-800">
+                            <button onClick={(): void => openEditDialog(row.original)}
+                                    className="text-blue-600 hover:text-blue-800">
                                 Edit
                             </button>
                             <button onClick={(): void => openDeleteDialog(row.original)}

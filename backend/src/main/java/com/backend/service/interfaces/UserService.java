@@ -1,7 +1,7 @@
 package com.backend.service.interfaces;
 
 import com.backend.model.User;
-import com.backend.security.RegisterRequest;
+import com.backend.model.requests.RegisterRequest;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 

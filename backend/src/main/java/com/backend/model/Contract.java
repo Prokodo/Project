@@ -2,6 +2,8 @@ package com.backend.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "contract")
@@ -26,6 +28,9 @@ public class Contract {
     @ManyToOne(optional = false)
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;
+
+    @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Invoice> invoices = new ArrayList<>();
 
     public Contract() {}
 

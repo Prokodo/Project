@@ -1,14 +1,14 @@
 package com.backend.security;
 
-import com.backend.service.interfaces.UserService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -16,36 +16,43 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 public class SecurityConfig {
-    private final @NotNull UserService userService;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final @NotNull JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(final @NotNull @Lazy UserService userService, JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.userService = userService;
+    public SecurityConfig(final @NotNull JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public @NotNull PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        return http
-            .getSharedObject(AuthenticationManagerBuilder.class)
-            .userDetailsService(userService).passwordEncoder(passwordEncoder()).and().build();
-    }
-
-    @Bean
     public SecurityFilterChain filterChain(final @NotNull HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http.csrf(AbstractHttpConfigurer::disable)
             .cors(Customizer.withDefaults())
-            .authorizeHttpRequests(auth ->
-                    auth.requestMatchers("/api/auth/**").permitAll()
-                            .anyRequest().authenticated()
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/**").permitAll()
+
+                // Endpoints requiring authentication
+                .requestMatchers("/api/requests/**").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/contracts/**", "/api/invoices/**").authenticated()
+
+                // Admin-only endpoints
+                .requestMatchers("/api/users/**", "/api/properties/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/contracts/**", "/api/invoices/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/contracts/**", "/api/invoices/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/contracts/**", "/api/invoices/**").hasRole("ADMIN")
+
+                .anyRequest().authenticated()
             )
             .httpBasic(Customizer.withDefaults())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(final @NotNull AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }

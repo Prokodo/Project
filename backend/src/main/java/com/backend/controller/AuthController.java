@@ -1,10 +1,9 @@
 package com.backend.controller;
 
-import com.backend.security.AuthRequest;
-import com.backend.security.JwtTokenProvider;
-import com.backend.security.RegisterRequest;
-import com.backend.service.interfaces.UserService;
+import com.backend.model.requests.AuthRequest;
 import org.jetbrains.annotations.NotNull;
+import com.backend.security.JwtTokenProvider;
+import com.backend.service.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -9,7 +9,10 @@ import java.util.List;
 @Service
 public interface ContractService {
     void deleteContract(long id);
+
     List<Contract> getAllContracts();
+    List<Contract> getContractsByUserId(Long userId);
+
     Contract getContractById(long id);
     Contract createContract(ContractRequest contract);
     Contract updateContract(long id, ContractRequest updatedContract);

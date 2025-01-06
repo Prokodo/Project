@@ -21,7 +21,7 @@ interface Request {
 }
 
 type RolesResponse = {
-    roles: string[];
+    roles: validRoles[];
     loggedIn: boolean;
 };
 
@@ -49,4 +49,13 @@ interface Contract {
     property: Property;
 }
 
-export type { Property, Request, RequestStatus, AuthorityResponse, RolesResponse, Tenant, Contract };
+interface Invoice {
+    id: number;
+    contractId: number;
+    issueDate: string;
+    dueDate: string;
+    amount: number;
+    paid: boolean;
+}
+
+export type { Property, Request, RequestStatus, AuthorityResponse, RolesResponse, Tenant, Contract, Invoice };

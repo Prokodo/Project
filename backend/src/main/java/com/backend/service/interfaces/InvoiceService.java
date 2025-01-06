@@ -1,6 +1,7 @@
 package com.backend.service.interfaces;
 
 import com.backend.model.Invoice;
+import com.backend.model.requests.InvoiceRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,7 +10,8 @@ import java.util.List;
 public interface InvoiceService {
     List<Invoice> getAllInvoices();
     Invoice getInvoiceById(long id);
-    Invoice createInvoice(Invoice invoice);
+    List<Invoice> getInvoicesByUserId(Long userId);
+    Invoice createInvoice(InvoiceRequest invoice);
     Invoice updateInvoice(long id, Invoice updatedInvoice);
     void deleteInvoice(long id);
 }

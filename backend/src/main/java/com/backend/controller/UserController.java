@@ -2,7 +2,7 @@ package com.backend.controller;
 
 import com.backend.errors.UserNotFoundException;
 import com.backend.model.User;
-import com.backend.security.RegisterRequest;
+import com.backend.model.requests.RegisterRequest;
 import com.backend.service.interfaces.UserService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -4,15 +4,17 @@ import com.backend.errors.UserNotFoundException;
 import com.backend.model.User;
 import com.backend.model.enums.Role;
 import com.backend.repository.UserRepository;
-import com.backend.security.RegisterRequest;
+import com.backend.security.model.CustomUserDetails;
+import com.backend.model.requests.RegisterRequest;
 import com.backend.service.interfaces.UserService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,15 +55,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(final @NotNull String username) throws UsernameNotFoundException {
-        final User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
-
-        return org.springframework.security.core.userdetails.User
-            .withUsername(user.getUsername())
-            .password(user.getPassword())
-            .roles(user.getRole())
-            .build();
+    public CustomUserDetails loadUserByUsername(final @NotNull String username) throws UsernameNotFoundException {
+        final User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        final @NotNull List<@NotNull SimpleGrantedAuthority> authorities = Arrays.stream(user.getRole().split(",")).map(SimpleGrantedAuthority::new).toList();
+        return new CustomUserDetails(
+            user.getId(),
+            user.getUsername(),
+            user.getPassword(),
+            authorities
+        );
     }
 
     public User updateUser(long id, RegisterRequest registerRequest) {
@@ -69,13 +71,13 @@ public class UserServiceImpl implements UserService {
         User existingUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found"));
 
         // Update fields based on the RegisterRequest
-        existingUser.setUsername(registerRequest.getUsername());
-        existingUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        existingUser.setRole(registerRequest.getRole());
-        existingUser.setFirstName(registerRequest.getFirstName());
-        existingUser.setSurname(registerRequest.getSurname());
-        existingUser.setEmail(registerRequest.getEmail());
-        existingUser.setPhoneNumber(registerRequest.getPhoneNumber());
+        existingUser.setUsername(registerRequest.username());
+        existingUser.setPassword(passwordEncoder.encode(registerRequest.password()));
+        existingUser.setRole(registerRequest.role());
+        existingUser.setFirstName(registerRequest.firstName());
+        existingUser.setSurname(registerRequest.surname());
+        existingUser.setEmail(registerRequest.email());
+        existingUser.setPhoneNumber(registerRequest.phoneNumber());
 
         // Save the updated user to the database
         return userRepository.save(existingUser);
@@ -83,9 +85,9 @@ public class UserServiceImpl implements UserService {
 
     public User registerUser(final @NotNull RegisterRequest registerRequest) {
         return registerUser(
-            registerRequest.getUsername(), registerRequest.getPassword(), registerRequest.getFirstName(),
-            registerRequest.getSurname(), registerRequest.getEmail(), registerRequest.getPhoneNumber(),
-            registerRequest.getRole()
+            registerRequest.username(), registerRequest.password(), registerRequest.firstName(),
+            registerRequest.surname(), registerRequest.email(), registerRequest.phoneNumber(),
+            registerRequest.role()
         );
     }
 

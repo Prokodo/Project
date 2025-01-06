@@ -31,6 +31,11 @@ public class ContractServiceImpl implements ContractService {
         return contractRepository.findAll();
     }
 
+    public List<Contract> getContractsByUserId(final Long id) {
+        return contractRepository.findContractByTenantId(id);
+    }
+
+
     public Contract getContractById(final long id) {
         return contractRepository
                 .findById(id)

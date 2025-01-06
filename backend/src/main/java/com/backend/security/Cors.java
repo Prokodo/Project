@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class Cors {
     @Bean
-    public WebMvcConfigurer corsConfigurer() {
+    public @NotNull WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             public void addCorsMappings(final @NotNull CorsRegistry registry) {
                 registry.addMapping("/api/**")               // Apply CORS rules to all API routes

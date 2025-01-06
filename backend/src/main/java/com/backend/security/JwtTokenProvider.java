@@ -1,5 +1,6 @@
 package com.backend.security;
 
+import com.backend.security.model.CustomUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.jetbrains.annotations.NotNull;
@@ -20,53 +21,65 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
     @Value("${jwt.secret}")
-    private String jwtSecret;
+    private @NotNull String jwtSecret;
 
     @Value("${jwt.expiration}")
-    private long jwtExpirationInMs;
+    private @NotNull Long jwtExpirationInMs;
 
     public String generateToken(final @NotNull Authentication authentication) {
-        final String username = authentication.getName();
-        final String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
+        final @NotNull CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        final Date now = new Date();
-        final Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
-        final Key signingKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-        return Jwts
-            .builder().setSubject(username).claim("roles", authorities).setIssuedAt(now)
-            .setExpiration(expiryDate).signWith(signingKey, SignatureAlgorithm.HS512).compact();
+        final @NotNull Long userId = userDetails.getUserId();
+        final @NotNull String username = userDetails.getUsername();
+        final @NotNull String authorities = userDetails.getAuthorities().stream().map(authority -> {
+            final @NotNull String role = authority.getAuthority();
+            return role.startsWith("ROLE_") ? role : "ROLE_" + role;
+        }).collect(Collectors.joining(","));
+
+        final @NotNull Date now = new Date();
+        final @NotNull Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+        final @NotNull Key signingKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+
+        return Jwts.builder().setSubject(username).claim("userId", userId) .claim("roles", authorities)
+            .setIssuedAt(now).setExpiration(expiryDate).signWith(signingKey, SignatureAlgorithm.HS512).compact();
     }
 
-    public String getUsernameFromJWT(final @NotNull String token) {
-        final Key signingKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+    public @NotNull Long getUserIdFromJWT(final @NotNull String token) {
+        final @NotNull Key signingKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+        final @NotNull Claims claims = Jwts.parserBuilder().setSigningKey(signingKey).build().parseClaimsJws(token).getBody();
+        return claims.get("userId", Long.class);
+    }
+
+    public @NotNull String getUsernameFromJWT(final @NotNull String token) {
+        final @NotNull Key signingKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
         return Jwts.parserBuilder().setSigningKey(signingKey).build().parseClaimsJws(token).getBody().getSubject();
     }
 
-    public List<GrantedAuthority> getRolesFromJWT(final @NotNull String token) {
-        final Key signingKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-        final Claims claims = Jwts.parserBuilder().setSigningKey(signingKey).build().parseClaimsJws(token).getBody();
+    public @NotNull List<@NotNull GrantedAuthority> getRolesFromJWT(final @NotNull String token) {
+        final @NotNull Key signingKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+        final @NotNull Claims claims = Jwts.parserBuilder().setSigningKey(signingKey).build().parseClaimsJws(token).getBody();
 
-        final String roles = claims.get("roles", String.class);
+        final @NotNull String roles = claims.get("roles", String.class);
         if (roles == null || roles.trim().isEmpty()) {
             return new ArrayList<>();
         }
         return Arrays.stream(roles.split(",")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 
-    public boolean validateToken(final @NotNull String authToken) {
+    public @NotNull Boolean validateToken(final @NotNull String authToken) {
         try {
-            final Key signingKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+            final @NotNull Key signingKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
             Jwts.parserBuilder().setSigningKey(signingKey).build().parseClaimsJws(authToken);
             return true;
-        } catch (final SignatureException exception) {
-            System.out.println("Invalid JWT signature");
-        } catch (final MalformedJwtException exception) {
+        } catch (final @NotNull SecurityException exception) {
+            System.out.println("Invalid JWT signature or security issue");
+        } catch (final @NotNull MalformedJwtException exception) {
             System.out.println("Invalid JWT token");
-        } catch (final ExpiredJwtException exception) {
+        } catch (final @NotNull ExpiredJwtException exception) {
             System.out.println("Expired JWT token");
-        } catch (final UnsupportedJwtException exception) {
+        } catch (final @NotNull UnsupportedJwtException exception) {
             System.out.println("Unsupported JWT token");
-        } catch (final IllegalArgumentException exception) {
+        } catch (final @NotNull IllegalArgumentException exception) {
             System.out.println("JWT claims string is empty.");
         }
         return false;

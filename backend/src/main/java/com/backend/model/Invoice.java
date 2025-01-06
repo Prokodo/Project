@@ -26,7 +26,6 @@ public class Invoice {
     @Column(nullable = false)
     private boolean paid;
 
-
     public Invoice() {}
 
     public Invoice(Contract contract, LocalDate issueDate, LocalDate dueDate, double amount, boolean paid) {

@@ -3,7 +3,7 @@ import {fetchTenants} from "@/services/tenants";
 import {fetchContracts} from "@/services/contracts";
 import {fetchProperties} from "@/services/properties";
 import {Contract, Property, RolesResponse, Tenant} from "@/types/types";
-import {checkUserAuthority, getAuthToken} from "@/utils/auth";
+import {getAuthToken} from "@/utils/auth";
 import ContractList from "@/components/contracts/ContractList";
 import {TenantsProvider} from "@/components/tenants/TenantContext";
 import {ContractProvider} from "@/components/contracts/ContractContext";

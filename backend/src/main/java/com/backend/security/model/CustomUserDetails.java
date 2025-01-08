@@ -6,14 +6,14 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 
 public class CustomUserDetails extends org.springframework.security.core.userdetails.User {
-    private final @NotNull Long userId;
+    private final Long userId;
 
-    public CustomUserDetails(final @NotNull Long userId, final @NotNull String username, final @NotNull String password, final @NotNull Collection<? extends GrantedAuthority> authorities) {
+    public CustomUserDetails(final Long userId, final String username, final String password, final Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
         this.userId = userId;
     }
 
-    public @NotNull Long getUserId() {
+    public Long getUserId() {
         return userId;
     }
 }

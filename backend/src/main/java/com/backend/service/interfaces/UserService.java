@@ -11,7 +11,6 @@ import java.util.List;
 public interface UserService extends UserDetailsService {
     void save(User user);
     void deleteUserById(Long id);
-    User findByUsername(String username);
     List<User> getUsersByRole(String role);
     User registerUser(RegisterRequest registerRequest);
     User updateUser(long id, RegisterRequest registerRequest);

@@ -14,22 +14,22 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/requests")
 public class RequestController {
-    private final @NotNull UserRepository userRepository;
-    private final @NotNull RequestService requestService;
-    private final @NotNull PropertyRepository propertyRepository;
+    private final UserRepository userRepository;
+    private final RequestService requestService;
+    private final PropertyRepository propertyRepository;
 
     @Autowired
-    public RequestController(final @NotNull RequestService requestService, final @NotNull UserRepository userRepository, final @NotNull PropertyRepository propertyRepository) {
+    public RequestController(final RequestService requestService, final UserRepository userRepository, final PropertyRepository propertyRepository) {
         this.requestService = requestService;
         this.userRepository = userRepository;
         this.propertyRepository = propertyRepository;
     }
 
-    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- GET -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     @GetMapping
-    public List<Request> getAllRequests() {
-        return requestService.getAllRequests();
+    public List<Request> getListOfRequests() {
+        return requestService.getListOfRequests();
     }
 
     @GetMapping("/users/{id}")
@@ -39,10 +39,10 @@ public class RequestController {
 
     @GetMapping("/properties/{id}")
     public ResponseEntity<List<Request>> getRequestsByPropertyId(final @PathVariable Long id) {
-        return ResponseEntity.ok(requestService.getRequestByProperty(id));
+        return ResponseEntity.ok(requestService.getListOfRequestsByPropertyId(id));
     }
 
-    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- POST -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     @PostMapping("/{propertyId}")
     public ResponseEntity<Request> createRequest(final @PathVariable Long propertyId, final @RequestBody Request request) {
@@ -54,13 +54,17 @@ public class RequestController {
         return ResponseEntity.ok(requestService.createRequest(request));
     }
 
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- PUT -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
+
     @PutMapping("/{id}")
-    public ResponseEntity<Request> updateRequest(final @PathVariable long id, final @RequestBody Request updatedRequest) {
+    public ResponseEntity<Request> updateRequest(final @PathVariable Long id, final @RequestBody Request updatedRequest) {
         return ResponseEntity.ok(requestService.updateRequest(id, updatedRequest));
     }
 
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DELETE -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
     @PutMapping("/status/{id}")
-    public ResponseEntity<Request> updateRequestStatus(final @PathVariable long id, final @RequestBody Request updatedRequest) {
+    public ResponseEntity<Request> updateRequestStatus(final @PathVariable Long id, final @RequestBody Request updatedRequest) {
         return ResponseEntity.ok(requestService.updateRequestStatus(id, updatedRequest.getStatus()));
     }
 }

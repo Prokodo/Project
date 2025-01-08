@@ -2,6 +2,7 @@ package com.backend.service;
 
 import com.backend.model.Contract;
 import com.backend.model.Invoice;
+import com.backend.model.enums.InvoiceStatus;
 import org.springframework.stereotype.Service;
 import com.backend.model.requests.InvoiceRequest;
 import com.backend.repository.ContractRepository;
@@ -13,52 +14,58 @@ import java.util.List;
 
 @Service
 public class InvoiceServiceImpl implements InvoiceService {
-    private final ContractRepository contractRepository;
     private final InvoiceRepository invoiceRepository;
+    private final ContractRepository contractRepository;
 
     @Autowired
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, ContractRepository contractRepository) {
+    public InvoiceServiceImpl(final InvoiceRepository invoiceRepository, final ContractRepository contractRepository) {
         this.invoiceRepository = invoiceRepository;
         this.contractRepository = contractRepository;
     }
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- GET -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     public List<Invoice> getAllInvoices() {
         return invoiceRepository.findAll();
     }
 
+    public Invoice getInvoiceById(final Long invoiceId) {
+        if (invoiceId == null || invoiceId <= 0) {
+            throw new IllegalArgumentException("Invalid invoice ID.");
+        }
+        return invoiceRepository.findById(invoiceId).orElseThrow(() -> new RuntimeException("Invoice with ID " + invoiceId + " not found."));
+    }
+
     public List<Invoice> getInvoicesByUserId(final Long userId) {
+        if (userId == null || userId <= 0) {
+            throw new IllegalArgumentException("Invalid user ID.");
+        }
         return invoiceRepository.findInvoicesByContractTenantId(userId);
     }
 
-    public Invoice getInvoiceById(final long id) {
-        return invoiceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Invoice not found with ID " + id));
-    }
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- POST -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     public Invoice createInvoice(final InvoiceRequest request) {
-        Invoice invoice = new Invoice();
+        if (request.contractId() == null || request.contractId() <= 0) {
+            throw new IllegalArgumentException("Invalid contract ID in invoice request.");
+        }
+        if (request.dueDate() == null || request.issueDate() == null) {
+            throw new IllegalArgumentException("Due date and issue date cannot be null.");
+        }
+        if (request.dueDate().isBefore(request.issueDate())) {
+            throw new IllegalArgumentException("Due date cannot be earlier than issue date.");
+        }
 
-        Contract contract = contractRepository.findById(request.contractId()).orElseThrow(() -> new IllegalArgumentException("Contract not found with ID: " + request.contractId()));
-        invoice.setPaid(request.paid());
-        invoice.setContract(contract);
-        invoice.setDueDate(request.dueDate());
-        invoice.setIssueDate(request.issueDate());
-        invoice.setAmount(contract.getMonthlyRent());
-
+        final Contract contract = contractRepository.findById(request.contractId()).orElseThrow(() -> new IllegalArgumentException("Contract not found with ID: " + request.contractId()));
+        final Invoice invoice = new Invoice(contract, request.issueDate(), request.dueDate(), InvoiceStatus.UNPAID);
         return invoiceRepository.save(invoice);
     }
 
-    public Invoice updateInvoice(final long id, final Invoice updatedInvoice) {
-        Invoice invoice = getInvoiceById(id);
-        invoice.setContract(updatedInvoice.getContract());
-        invoice.setIssueDate(updatedInvoice.getIssueDate());
-        invoice.setDueDate(updatedInvoice.getDueDate());
-        invoice.setAmount(updatedInvoice.getAmount());
-        invoice.setPaid(updatedInvoice.isPaid());
-        return invoiceRepository.save(invoice);
-    }
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- PUT -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 
-    public void deleteInvoice(final long id) {
-        invoiceRepository.deleteById(id);
+    public Invoice updateInvoicePaidStatus(final Long id, final InvoiceStatus status) {
+        final Invoice invoice = getInvoiceById(id);
+        invoice.setStatus(status);
+        return invoiceRepository.save(invoice);
     }
 }

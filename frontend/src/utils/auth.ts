@@ -14,11 +14,6 @@ async function checkUserAuthority(authToken: string | undefined, requiredRole: v
         redirect('/login');
     }
 
-    const authority: AuthorityResponse | undefined = await hasAuthority(authToken, requiredRole);
-    if (!authority || !authority.authorized) {
-        return unauthorized();
-    }
-    return authority;
 }
 
 export {getAuthToken, checkUserAuthority};

@@ -1,6 +1,8 @@
 package com.backend.model;
 
 import jakarta.persistence.*;
+import org.jetbrains.annotations.NotNull;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +36,7 @@ public class Contract {
 
     public Contract() {}
 
-    public Contract(Property property, User tenant, LocalDate startDate, LocalDate endDate, double monthlyRent) {
+    public Contract(final Property property, final User tenant, final LocalDate startDate, final LocalDate endDate, final double monthlyRent) {
         this.property = property;
         this.tenant = tenant;
         this.startDate = startDate;

@@ -1,11 +1,11 @@
 package com.backend.model.requests;
 
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDate;
 
 public record ContractRequest(
-    @NotNull Long propertyId, @NotNull Long tenantId,
-    @NotNull LocalDate startDate, @NotNull LocalDate endDate,
-    @NotNull Double monthlyRent
+    Long propertyId, Long tenantId,
+    LocalDate startDate, LocalDate endDate,
+    Double monthlyRent
 ) {}

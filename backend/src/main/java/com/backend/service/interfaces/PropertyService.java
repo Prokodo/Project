@@ -10,6 +10,7 @@ import java.util.Optional;
 @Service
 public interface PropertyService {
     List<Property> getAllProperties();
+    Integer getNumberOfProperties();
     Optional<Property> getPropertyById(long id);
     Property saveProperty(Property property);
     Property updateProperty(long id, Property updatedProperty, MultipartFile imageFile);

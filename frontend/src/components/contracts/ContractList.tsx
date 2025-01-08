@@ -58,17 +58,15 @@ const ContractList = ({ roles=[] }: { roles: validRoles[] }) => {
 
     const handleGenerateInvoice = async (contractId: number): Promise<void> => {
         try {
-            const issueDate = new Date().toISOString().split("T")[0]; // Current date
+            const issueDate = new Date().toISOString().split("T")[0];
             const dueDate = new Date();
-            dueDate.setDate(dueDate.getDate() + 30); // Due date 30 days later
+            dueDate.setDate(dueDate.getDate() + 30);
             const dueDateString = dueDate.toISOString().split("T")[0];
 
             const invoiceRequest = {
                 contractId,
                 issueDate,
                 dueDate: dueDateString,
-                amount: 1000.0,
-                paid: false,
             };
 
             const url: string = `http://localhost:8080/api/invoices`;

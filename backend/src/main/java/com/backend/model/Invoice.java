@@ -1,11 +1,15 @@
 package com.backend.model;
 
+import com.backend.model.enums.InvoiceStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "Invoice")
+@Table(name = "invoice")
 public class Invoice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,60 +19,69 @@ public class Invoice {
     private Contract contract;
 
     @Column(nullable = false)
+    @NotNull(message = "Issue date must not be null")
     private LocalDate issueDate;
 
     @Column(nullable = false)
+    @NotNull(message = "Due date must not be null")
+    @FutureOrPresent(message = "Due date must be in the present or future")
     private LocalDate dueDate;
 
     @Column(nullable = false)
-    private double amount;
+    @NotNull(message = "Amount must not be null")
+    @Positive(message = "Amount must be a positive value")
+    private Double amount;
 
     @Column(nullable = false)
-    private boolean paid;
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Invoice status must not be null")
+    private InvoiceStatus status;
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- CONSTRUCTORS -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 
     public Invoice() {}
 
-    public Invoice(Contract contract, LocalDate issueDate, LocalDate dueDate, double amount, boolean paid) {
+    public Invoice(final Contract contract, final LocalDate issueDate, final LocalDate dueDate, final InvoiceStatus status) {
+        this.status = status;
+        this.dueDate = dueDate;
         this.contract = contract;
         this.issueDate = issueDate;
-        this.dueDate = dueDate;
-        this.amount = amount;
-        this.paid = paid;
+        this.amount = contract.getMonthlyRent();
     }
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- GETTERS -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     public Long getId() {
         return id;
-    }
-
-    public boolean isPaid() {
-        return paid;
     }
 
     public double getAmount() {
         return amount;
     }
 
-    public LocalDate getDueDate() {
-        return dueDate;
-    }
-
     public Contract getContract() {
         return contract;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
     }
 
     public LocalDate getIssueDate() {
         return issueDate;
     }
 
-    public void setId(final long id) {
+    public InvoiceStatus getStatus() {
+        return status;
+    }
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SETTERS -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
+    public void setId(final Long id) {
         this.id = id;
     }
 
-    public void setPaid(final boolean paid) {
-        this.paid = paid;
-    }
-
-    public void setAmount(final double amount) {
+    public void setAmount(final Double amount) {
         this.amount = amount;
     }
 
@@ -78,6 +91,10 @@ public class Invoice {
 
     public void setContract(final Contract contract) {
         this.contract = contract;
+    }
+
+    public void setStatus(final InvoiceStatus status) {
+        this.status = status;
     }
 
     public void setIssueDate(final LocalDate issueDate) {

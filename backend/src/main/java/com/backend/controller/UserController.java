@@ -15,22 +15,26 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-    private final @NotNull UserService userService;
+    private final UserService userService;
 
     @Autowired
-    public UserController(final @NotNull UserService userService) {
+    public UserController(final UserService userService) {
         this.userService = userService;
     }
 
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- GET -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
     @GetMapping("/tenants")
-    public ResponseEntity<?> getAllTenants() {
+    public ResponseEntity<? extends Object> getAllTenants() {
         return ResponseEntity.ok(userService.getUsersByRole("TENANT"));
     }
 
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- POST -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
     @PostMapping("/tenants/register")
-    public ResponseEntity<?> register(final @RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<? extends Object> register(final @NotNull@RequestBody RegisterRequest registerRequest) {
         try {
-            User registeredUser = userService.registerUser(registerRequest);
+            final User registeredUser = userService.registerUser(registerRequest);
             return ResponseEntity.ok(registeredUser);
         }
         catch (final IllegalArgumentException exception) {
@@ -38,8 +42,26 @@ public class UserController {
         }
     }
 
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- PUT -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
+
+    @PutMapping("/tenants/{id}")
+    public ResponseEntity<? extends Object> updateUser(final @PathVariable Long id, final @RequestBody RegisterRequest registerRequest) {
+        try {
+            final User updatedUser = userService.updateUser(id, registerRequest);
+            return ResponseEntity.ok(updatedUser);
+        }
+        catch (final UserNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", exception.getMessage()));
+        }
+        catch (final IllegalArgumentException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", exception.getMessage()));
+        }
+    }
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DELETE -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
     @DeleteMapping("/tenants/{id}")
-    public ResponseEntity<?> deleteUser(final @PathVariable Long id) {
+    public ResponseEntity<? extends Object> deleteUser(final @PathVariable Long id) {
         try {
             userService.deleteUserById(id);
             return ResponseEntity.ok(Map.of(
@@ -55,20 +77,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                 "error", "An error occurred while deleting the user"
             ));
-        }
-    }
-
-    @PutMapping("/tenants/{id}")
-    public ResponseEntity<?> updateUser(final @PathVariable long id, final @RequestBody RegisterRequest registerRequest) {
-        try {
-            User updatedUser = userService.updateUser(id, registerRequest);
-            return ResponseEntity.ok(updatedUser);
-        }
-        catch (final UserNotFoundException exception) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", exception.getMessage()));
-        }
-        catch (final IllegalArgumentException exception) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", exception.getMessage()));
         }
     }
 }

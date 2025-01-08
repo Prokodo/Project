@@ -12,52 +12,56 @@ import java.util.List;
 
 @Service
 public class RequestServiceImpl implements RequestService {
-    private final @NotNull RequestRepository requestRepository;
+    private final RequestRepository requestRepository;
 
     @Autowired
-    public RequestServiceImpl(final @NotNull RequestRepository requestRepository) {
+    public RequestServiceImpl(final RequestRepository requestRepository) {
         this.requestRepository = requestRepository;
     }
 
-    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- GET -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
-    public List<Request> getAllRequests() {
+    public List<Request> getListOfRequests() {
         return requestRepository.findAll();
     }
 
-    public Request getRequestById(final @NotNull Long id) {
+    public Request getRequestById(final Long id) {
         return requestRepository.findById(id).orElseThrow(() -> new RuntimeException("Request not found with ID " + id));
     }
 
-    public List<Request> getRequestsByUserId(final @NotNull Long userId) {
+    public List<Request> getListOfRequestsByUserId(final Long userId) {
         return requestRepository.findAll();
     }
 
-    public List<Request> getRequestByProperty(final @NotNull Long propertyId) {
+    public List<Request> getListOfRequestsByPropertyId(final Long propertyId) {
         return requestRepository.findByPropertyId(propertyId);
     }
 
-    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- POST -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
-    public void deleteRequest(final @NotNull Long id) {
-        requestRepository.deleteById(id);
-    }
-
-    public Request createRequest(final @NotNull Request request) {
+    public Request createRequest(final Request request) {
         return requestRepository.save(request);
     }
 
-    public Request updateRequest(final @NotNull Long id, final @NotNull Request updatedRequest) {
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- PUT -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
+
+    public Request updateRequest(final Long id, final Request updatedRequest) {
         final Request request = getRequestById(id);
         request.setStatus(updatedRequest.getStatus());
         request.setDescription(updatedRequest.getDescription());
         return requestRepository.save(request);
     }
 
-    public Request updateRequestStatus(final @NotNull Long id, final @NotNull RequestStatus status) {
+    public Request updateRequestStatus(final Long id, final RequestStatus status) {
         final Request request = getRequestById(id);
         request.setStatus(status);
 
         return requestRepository.save(request);
+    }
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DELETE -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
+    public void deleteRequest(final Long id) {
+        requestRepository.deleteById(id);
     }
 }

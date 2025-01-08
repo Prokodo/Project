@@ -3,6 +3,7 @@ package com.backend.security;
 import com.backend.security.model.CustomUserPrincipal;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
@@ -18,13 +19,13 @@ import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final @NotNull JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public JwtAuthenticationFilter(final @NotNull JwtTokenProvider jwtTokenProvider) {
+    public JwtAuthenticationFilter(final JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    private @Nullable String getJwtFromCookies(final @NotNull HttpServletRequest request) {
+    private String getJwtFromHeader(final HttpServletRequest request) {
         final String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
             return header.substring(7);
@@ -32,16 +33,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 
-    @Override
-    protected void doFilterInternal(final @NotNull HttpServletRequest request, final @NotNull HttpServletResponse response, final @NotNull FilterChain filterChain) throws ServletException, IOException {
-        final @Nullable String jwt = getJwtFromCookies(request);
-        if (jwt != null && jwtTokenProvider.validateToken(jwt)) {
-            final @NotNull Long userId = jwtTokenProvider.getUserIdFromJWT(jwt);
-            final @NotNull String username = jwtTokenProvider.getUsernameFromJWT(jwt);
-            final @NotNull List<GrantedAuthority> authorities = jwtTokenProvider.getRolesFromJWT(jwt);
-            final @NotNull CustomUserPrincipal principal = new CustomUserPrincipal(userId, username, authorities);
+    private String getJwtFromCookies(final HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (final Cookie cookie : request.getCookies()) {
+                if ("authToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
 
-            final @NotNull UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(principal, null, authorities);
+    @Override
+    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException {
+        String jwt = getJwtFromHeader(request);
+        if (jwt == null) {
+            jwt = getJwtFromCookies(request);
+        }
+
+        if (jwt != null && jwtTokenProvider.validateToken(jwt)) {
+            final Long userId = jwtTokenProvider.getUserIdFromJWT(jwt);
+            final String username = jwtTokenProvider.getUsernameFromJWT(jwt);
+            final List<GrantedAuthority> authorities = jwtTokenProvider.getRolesFromJWT(jwt);
+            final CustomUserPrincipal principal = new CustomUserPrincipal(userId, username, authorities);
+
+            final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(principal, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         filterChain.doFilter(request, response);

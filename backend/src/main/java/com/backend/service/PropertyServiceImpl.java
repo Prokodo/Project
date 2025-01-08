@@ -14,14 +14,18 @@ import java.util.Optional;
 
 @Service
 public class PropertyServiceImpl implements PropertyService {
-    private final @NotNull PropertyRepository propertyRepository;
+    private final PropertyRepository propertyRepository;
 
     @Autowired
-    public PropertyServiceImpl(final @NotNull PropertyRepository propertyRepository) {
+    public PropertyServiceImpl(final PropertyRepository propertyRepository) {
         this.propertyRepository = propertyRepository;
     }
 
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
+    public Integer getNumberOfProperties() {
+        return propertyRepository.findAll().size();
+    }
 
     public List<Property> getAllProperties() {
         return propertyRepository.findAll();
@@ -37,11 +41,11 @@ public class PropertyServiceImpl implements PropertyService {
         propertyRepository.deleteById(id);
     }
 
-    public Property saveProperty(final @NotNull Property property) {
+    public Property saveProperty(final Property property) {
         return propertyRepository.save(property);
     }
 
-    public Property saveProperty(final @NotNull Property property, final MultipartFile imageFile) {
+    public Property saveProperty(final Property property, final MultipartFile imageFile) {
         try {
             if (imageFile != null && !imageFile.isEmpty()) {
                 property.setImage(imageFile.getBytes());
@@ -52,7 +56,7 @@ public class PropertyServiceImpl implements PropertyService {
         }
     }
 
-    private void updatePropertyImage(final @NotNull Property property, final MultipartFile imageFile) {
+    private void updatePropertyImage(final Property property, final MultipartFile imageFile) {
         if (imageFile != null && !imageFile.isEmpty()) {
             try {
                 property.setImage(imageFile.getBytes());
@@ -64,7 +68,7 @@ public class PropertyServiceImpl implements PropertyService {
         }
     }
 
-    private void updatePropertyDetails(final @NotNull Property property, final Property updatedProperty) {
+    private void updatePropertyDetails(final Property property, final Property updatedProperty) {
         property.setName(updatedProperty.getName());
         property.setType(updatedProperty.getType());
         property.setPrice(updatedProperty.getPrice());
@@ -72,7 +76,7 @@ public class PropertyServiceImpl implements PropertyService {
         property.setDescription(updatedProperty.getDescription());
     }
 
-    public Property updateProperty(final long id, final @NotNull Property updatedProperty, final MultipartFile imageFile) {
+    public Property updateProperty(final long id, final Property updatedProperty, final MultipartFile imageFile) {
         return propertyRepository.findById(id).map(property -> {
             updatePropertyDetails(property, updatedProperty);
             updatePropertyImage(property, imageFile);

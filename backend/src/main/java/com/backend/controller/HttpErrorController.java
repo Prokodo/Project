@@ -1,14 +1,15 @@
 package com.backend.controller;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-public class IndexController {
-    @GetMapping("/403")
+public class HttpErrorController {
     @ResponseBody
+    @GetMapping("/403")
     public String forbidden() {
-        return "Access Denied";
+        return "Error 403 - Access Denied";
     }
 }

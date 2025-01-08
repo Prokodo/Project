@@ -9,9 +9,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class Cors {
     @Bean
-    public @NotNull WebMvcConfigurer corsConfigurer() {
+    public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
-            public void addCorsMappings(final @NotNull CorsRegistry registry) {
+            public void addCorsMappings(final CorsRegistry registry) {
                 registry.addMapping("/api/**")               // Apply CORS rules to all API routes
                         .allowedOrigins("http://localhost:3000")        // Allow requests from frontend
                         .allowedMethods("GET", "POST", "PUT", "DELETE") // Allow main HTTP methods

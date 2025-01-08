@@ -1,5 +1,6 @@
 package com.backend.model.enums;
 
 public enum Role {
-    ADMIN, TENANT
+    ADMIN,
+    TENANT
 }

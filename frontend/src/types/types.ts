@@ -55,7 +55,8 @@ interface Invoice {
     issueDate: string;
     dueDate: string;
     amount: number;
-    paid: boolean;
+    status: string;
+    contract: Contract;
 }
 
 export type { Property, Request, RequestStatus, AuthorityResponse, RolesResponse, Tenant, Contract, Invoice };

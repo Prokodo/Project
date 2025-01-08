@@ -8,6 +8,7 @@ interface InvoiceContextType {
     setInvoices: React.Dispatch<React.SetStateAction<Invoice[]>>;
 
     addInvoice: (invoice: Invoice) => void;
+    updateInvoiceStatus: (id: number, status: string) => void;
 }
 
 const InvoiceContext: Context<InvoiceContextType | undefined> = createContext<InvoiceContextType | undefined>(undefined);
@@ -27,8 +28,16 @@ export const InvoiceProvider: React.FC<{ children: React.ReactNode, initialInvoi
         setInvoices((prevInvoices: Invoice[]): Invoice[] => [...prevInvoices, invoice]);
     };
 
+    const updateInvoiceStatus = (id: number, status: string): void => {
+        setInvoices((prevInvoices: Invoice[]) =>
+            prevInvoices.map((invoice: Invoice) =>
+                invoice.id === id ? { ...invoice, status } : invoice
+            )
+        );
+    };
+
     return (
-        <InvoiceContext.Provider value={{ invoices, setInvoices, addInvoice }}>
+        <InvoiceContext.Provider value={{ invoices, setInvoices, addInvoice, updateInvoiceStatus }}>
             {children}
         </InvoiceContext.Provider>
     );

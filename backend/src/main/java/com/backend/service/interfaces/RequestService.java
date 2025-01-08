@@ -8,11 +8,13 @@ import java.util.List;
 
 @Service
 public interface RequestService {
-     void deleteRequest(Long id);
-     List<Request> getAllRequests();
      Request getRequestById(Long id);
+     List<Request> getListOfRequests();
+     List<Request> getListOfRequestsByUserId(Long userId);
+     List<Request> getListOfRequestsByPropertyId(Long propertyId);
+
+     void deleteRequest(Long id);
      Request createRequest(Request request);
-     List<Request> getRequestByProperty(Long propertyId);
      Request updateRequest(Long id, Request updatedRequest);
      Request updateRequestStatus(Long id, RequestStatus status);
 }

@@ -10,10 +10,10 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class BackendApplication {
-	private final @NotNull UserService userService;
+	private final UserService userService;
 
 	@Autowired
-	public BackendApplication(final @NotNull UserService userService){
+	public BackendApplication(final UserService userService){
 		this.userService =userService;
 	}
 
@@ -29,7 +29,7 @@ public class BackendApplication {
 		};
 	}
 
-	public static void main(final @NotNull String[] args) {
+	public static void main(final String[] args) {
 		SpringApplication.run(BackendApplication.class, args);
 	}
 }

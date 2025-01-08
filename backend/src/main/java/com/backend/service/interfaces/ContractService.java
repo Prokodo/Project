@@ -8,12 +8,11 @@ import java.util.List;
 
 @Service
 public interface ContractService {
-    void deleteContract(long id);
-
-    List<Contract> getAllContracts();
+    Contract getContractById(Long id);
+    List<Contract> getListOfContracts();
     List<Contract> getContractsByUserId(Long userId);
 
-    Contract getContractById(long id);
+    void deleteContract(Long id);
     Contract createContract(ContractRequest contract);
-    Contract updateContract(long id, ContractRequest updatedContract);
+    Contract updateContract(Long id, ContractRequest updatedContract);
 }

@@ -22,23 +22,17 @@ import java.util.stream.Stream;
 @Service
 public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
-    private final @NotNull UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public UserServiceImpl(final @NotNull UserRepository userRepository, final @NotNull PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(final UserRepository userRepository, final PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public void save(final @NotNull User user) {
+    public void save(final User user) {
         userRepository.save(user);
-    }
-
-    @Override
-    public User findByUsername(final @NotNull String username) {
-        return userRepository.findByUsername(username)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
     }
 
     @Override
@@ -50,20 +44,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getUsersByRole(final @NotNull String role) {
+    public List<User> getUsersByRole(final String role) {
         return userRepository.findByRole(role);
-    }
-
-    @Override
-    public CustomUserDetails loadUserByUsername(final @NotNull String username) throws UsernameNotFoundException {
-        final User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
-        final @NotNull List<@NotNull SimpleGrantedAuthority> authorities = Arrays.stream(user.getRole().split(",")).map(SimpleGrantedAuthority::new).toList();
-        return new CustomUserDetails(
-            user.getId(),
-            user.getUsername(),
-            user.getPassword(),
-            authorities
-        );
     }
 
     public User updateUser(long id, RegisterRequest registerRequest) {
@@ -83,7 +65,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(existingUser);
     }
 
-    public User registerUser(final @NotNull RegisterRequest registerRequest) {
+    public User registerUser(final RegisterRequest registerRequest) {
         return registerUser(
             registerRequest.username(), registerRequest.password(), registerRequest.firstName(),
             registerRequest.surname(), registerRequest.email(), registerRequest.phoneNumber(),
@@ -92,8 +74,8 @@ public class UserServiceImpl implements UserService {
     }
 
     public User registerUser(
-        final @NotNull String username, final @NotNull String password, final @NotNull String firstName,
-        final @NotNull String surname, final @NotNull String email, final @NotNull String phoneNumber, final @NotNull String role
+        final String username, final String password, final String firstName,
+        final String surname, final String email, final String phoneNumber, final String role
     ) {
         if (userRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("Username already exists.");
@@ -107,5 +89,19 @@ public class UserServiceImpl implements UserService {
         final User user = new User(username, passwordEncoder.encode(password), firstName, surname, email, phoneNumber, role.toUpperCase());
         userRepository.save(user);
         return user;
+    }
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
+    @Override
+    public CustomUserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
+        final User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        final List<SimpleGrantedAuthority> authorities = Arrays.stream(user.getRole().split(",")).map(SimpleGrantedAuthority::new).toList();
+        return new CustomUserDetails(
+            user.getId(),
+            user.getUsername(),
+            user.getPassword(),
+            authorities
+        );
     }
 }

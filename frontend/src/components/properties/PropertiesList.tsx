@@ -129,7 +129,7 @@ const PropertiesList = () => {
     ];
 
     return (
-        <div className="max-w-5xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+        <div className="mt-8 mx-4 p-6 bg-white shadow-sm rounded-xl border border-gray-200">
             <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Properties List</h1>
             {error && (
                 <div className="mb-4 p-3 text-red-800 bg-red-100 border border-red-300 rounded">
@@ -148,7 +148,7 @@ const PropertiesList = () => {
                     </div>
                 </div>
             )}
-            <DataTable columns={columns} data={properties} />
+            <DataTable columns={columns} data={properties}/>
         </div>
     );
 };

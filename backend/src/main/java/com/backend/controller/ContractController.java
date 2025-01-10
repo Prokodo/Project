@@ -5,7 +5,7 @@ import com.backend.model.requests.ContractRequest;
 import com.backend.security.SecurityUtils;
 import com.backend.security.model.CustomUserPrincipal;
 import com.backend.service.interfaces.ContractService;
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,39 +27,40 @@ public class ContractController {
     @GetMapping
     public ResponseEntity<List<Contract>> getAllContracts() {
         final CustomUserPrincipal user = SecurityUtils.getCurrentUser();
-        final boolean isAdmin = SecurityUtils.isAdmin(user);
-        final Long userId = user.userId();
-
-        final List<Contract> contracts = isAdmin
-                ? contractService.getListOfContracts()
-                : contractService.getContractsByUserId(userId);
-        return ResponseEntity.ok(contracts);
+        if (SecurityUtils.isAdmin(user)) {
+            return ResponseEntity.ok(contractService.getListOfContracts());
+        }
+        return ResponseEntity.ok(contractService.getContractsByUserId(user.userId()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Contract> getContractById(final @PathVariable Long id) {
-        return ResponseEntity.ok(contractService.getContractById(id));
+        return contractService.getContractById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- POST -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     @PostMapping
-    public ResponseEntity<Contract> createContract(final @RequestBody ContractRequest contract) {
+    public ResponseEntity<Contract> createContract(final @RequestBody @Valid ContractRequest contract) {
         return ResponseEntity.ok(contractService.createContract(contract));
     }
 
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- PUT -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 
     @PutMapping("/{id}")
-    public ResponseEntity<Contract> updateContract(final @PathVariable Long id, final @RequestBody ContractRequest updatedContract) {
-        return ResponseEntity.ok(contractService.updateContract(id, updatedContract));
+    public ResponseEntity<Contract> updateContract(final @PathVariable Long id, final @RequestBody @Valid ContractRequest request) {
+        final Contract updatedContract = contractService.updateContract(id, request);
+        return ResponseEntity.ok(updatedContract);
     }
 
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DELETE -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteContract(final @NotNull@PathVariable Long id) {
-        contractService.deleteContract(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> deleteContract(final @PathVariable Long id) {
+        if (contractService.getContractById(id).isPresent()) {
+            contractService.deleteContract(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

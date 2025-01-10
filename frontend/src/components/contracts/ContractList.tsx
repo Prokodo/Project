@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useState} from "react";
+import React, {useMemo, useState} from "react";
 import {Contract} from "@/types/types";
 import {getCookie} from "@/utils/cookies";
 import {validRoles} from "@/services/global";
@@ -14,6 +14,7 @@ const ContractList = ({ roles=[] }: { roles: validRoles[] }) => {
     const isAdmin: boolean = roles.includes("ROLE_ADMIN");
 
     const [error, setError] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState<string>("");
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
     const [contractToEdit, setContractToEdit] = useState<Contract | undefined>(undefined);
@@ -91,6 +92,20 @@ const ContractList = ({ roles=[] }: { roles: validRoles[] }) => {
         }
     };
 
+    const filteredContracts: Contract[] = useMemo((): Contract[] => {
+        const searchWords: string[] = searchTerm.toLowerCase().split(" ").filter((word) => word.trim() !== "");
+        return contracts.filter((contract: Contract): boolean => {
+            return searchWords.every((word: string): boolean => {
+                return (
+                    contract.tenant.firstName.toLowerCase().includes(word) ||
+                    contract.tenant.surname.toLowerCase().includes(word) ||
+                    contract.property.name.toLowerCase().includes(word) ||
+                    contract.id.toString().includes(word)
+                );
+            });
+        });
+    }, [contracts, searchTerm]);
+
     const columns = [
         { accessorKey: "id", header: "Contract ID" },
         { accessorKey: "startDate", header: "Start Date" },
@@ -134,17 +149,35 @@ const ContractList = ({ roles=[] }: { roles: validRoles[] }) => {
     }
 
     return (
-        <div className="max-w-5xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+        <div className="mt-8 mx-4 p-6 bg-white shadow-sm rounded-xl border border-gray-200">
             <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Contracts List</h1>
+            {isAdmin && (
+                <div className="mb-4">
+                    <input type="text" placeholder="Quick Search (Tenant, Property, ID)"
+                           value={searchTerm} onChange={(e): void => setSearchTerm(e.target.value)}
+                           className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                </div>
+            )}
+
             {error && (
                 <div className="mb-4 p-3 text-red-800 bg-red-100 border border-red-300 rounded">
                     {error}
                 </div>
             )}
+
+            <DataTable columns={columns} data={filteredContracts} />
+            <ConfirmDialog title="Are you sure?"
+                           confirmLabel="Delete"
+                           cancelLabel="Cancel"
+                           description="This action cannot be undone. It will permanently delete the contract."
+                           isOpen={isDialogOpen}
+                           onConfirm={handleDelete}
+                           onCancel={(): void => setIsDialogOpen(false)} />
+
             {isEditDialogOpen && (
                 <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative">
-                        <button onClick={() => setIsEditDialogOpen(false)}
+                        <button onClick={(): void => setIsEditDialogOpen(false)}
                                 className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none">
                             ✖
                         </button>
@@ -153,15 +186,6 @@ const ContractList = ({ roles=[] }: { roles: validRoles[] }) => {
                     </div>
                 </div>
             )}
-
-            <DataTable columns={columns} data={contracts} />
-            <ConfirmDialog title="Are you sure?"
-                           confirmLabel="Delete"
-                           cancelLabel="Cancel"
-                           description="This action cannot be undone. It will permanently delete the contract."
-                           isOpen={isDialogOpen}
-                           onConfirm={handleDelete}
-                           onCancel={() => setIsDialogOpen(false)} />
         </div>
     );
 };

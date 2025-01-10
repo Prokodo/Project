@@ -1,5 +1,6 @@
 package com.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -14,10 +15,10 @@ import java.util.List;
 public class Property {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Lob
-    private byte[] image;
+    private Byte[] image;
 
     @NotBlank(message = "Property name cannot be blank.")
     @Size(max = 100, message = "Property name must be at most 100 characters.")
@@ -38,13 +39,15 @@ public class Property {
     @Size(max = 500, message = "Description must be at most 500 characters.")
     private String description;
 
-    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Contract> contracts = new ArrayList<>();
-
-    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private final List<Request> requests = new ArrayList<>();
 
-    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+    @JsonIgnore
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private final List<Contract> contracts = new ArrayList<>();
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- CONSTRUCTORS -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 
     public Property() {}
 
@@ -57,9 +60,9 @@ public class Property {
         this.description = description;
     }
 
-    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- GETTERS -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -75,7 +78,7 @@ public class Property {
         return price;
     }
 
-    public byte[] getImage() {
+    public Byte[] getImage() {
         return image;
     }
 
@@ -87,7 +90,17 @@ public class Property {
         return description;
     }
 
-    public void setId(final long id) {
+    public List<Contract> getContracts() {
+        return contracts;
+    }
+
+    public List<Request> getRequests() {
+        return requests;
+    }
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SETTERS -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -103,7 +116,7 @@ public class Property {
         this.price = price;
     }
 
-    public void setImage(final byte[] image) {
+    public void setImage(final Byte[] image) {
         this.image = image;
     }
 

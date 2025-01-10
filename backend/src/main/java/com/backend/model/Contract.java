@@ -1,7 +1,12 @@
 package com.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotNull;
+
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -12,27 +17,38 @@ import java.util.List;
 public class Contract {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false)
+    @NotNull(message = "Start date is required")
+    @FutureOrPresent(message = "Start date must be today or in the future")
     private LocalDate startDate;
 
     @Column(nullable = false)
+    @NotNull(message = "End date is required")
+    @Future(message = "End date must be in the future")
     private LocalDate endDate;
 
     @Column(nullable = false)
-    private double monthlyRent;
+    @NotNull(message = "Monthly rent is required")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Monthly rent must be greater than 0")
+    private Double monthlyRent;
 
     @ManyToOne(optional = false)
+    @NotNull(message = "Tenant is required")
     @JoinColumn(name = "tenant_id", nullable = false)
     private User tenant;
 
     @ManyToOne(optional = false)
+    @NotNull(message = "Property is required")
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;
 
-    @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Invoice> invoices = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private final List<Invoice> invoices = new ArrayList<>();
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- CONSTRUCTORS -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 
     public Contract() {}
 
@@ -44,7 +60,9 @@ public class Contract {
         this.monthlyRent = monthlyRent;
     }
 
-    public long getId() {
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- GETTERS -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
+    public Long getId() {
         return id;
     }
 
@@ -60,7 +78,7 @@ public class Contract {
         return endDate;
     }
 
-    public double getMonthlyRent() {
+    public Double getMonthlyRent() {
         return monthlyRent;
     }
 
@@ -68,7 +86,13 @@ public class Contract {
         return startDate;
     }
 
-    public void setId(final long id) {
+    public List<Invoice> getInvoices() {
+        return invoices;
+    }
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SETTERS -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -88,7 +112,7 @@ public class Contract {
         this.startDate = startDate;
     }
 
-    public void setMonthlyRent(final double monthlyRent) {
+    public void setMonthlyRent(final Double monthlyRent) {
         this.monthlyRent = monthlyRent;
     }
 }

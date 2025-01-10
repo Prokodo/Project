@@ -10,11 +10,11 @@ import com.backend.repository.ContractRepository;
 import com.backend.repository.PropertyRepository;
 import com.backend.repository.UserRepository;
 import com.backend.service.interfaces.ContractService;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ContractServiceImpl implements ContractService {
@@ -35,8 +35,8 @@ public class ContractServiceImpl implements ContractService {
         return contractRepository.findAll();
     }
 
-    public Contract getContractById(final Long id) {
-        return contractRepository.findById(id).orElseThrow(() -> new RuntimeException("Contract not found with ID " + id));
+    public Optional<Contract> getContractById(final Long id) {
+        return contractRepository.findById(id);
     }
 
     public List<Contract> getContractsByUserId(final Long id) {
@@ -65,7 +65,7 @@ public class ContractServiceImpl implements ContractService {
         final Property property = getPropertyOrThrow(request.propertyId());
         final User tenant = getTenantOrThrow(request.tenantId());
 
-        final Contract contract = getContractById(id);
+        final Contract contract = getContractById(id).orElseThrow(() -> new RuntimeException("Contract not found with ID " + id));
         contract.setTenant(tenant);
         contract.setProperty(property);
         contract.setEndDate(request.endDate());

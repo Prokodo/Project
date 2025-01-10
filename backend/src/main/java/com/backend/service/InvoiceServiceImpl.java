@@ -11,6 +11,7 @@ import com.backend.service.interfaces.InvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InvoiceServiceImpl implements InvoiceService {
@@ -25,15 +26,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- GET -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
-    public List<Invoice> getAllInvoices() {
+    public List<Invoice> getListOfInvoices() {
         return invoiceRepository.findAll();
-    }
-
-    public Invoice getInvoiceById(final Long invoiceId) {
-        if (invoiceId == null || invoiceId <= 0) {
-            throw new IllegalArgumentException("Invalid invoice ID.");
-        }
-        return invoiceRepository.findById(invoiceId).orElseThrow(() -> new RuntimeException("Invoice with ID " + invoiceId + " not found."));
     }
 
     public List<Invoice> getInvoicesByUserId(final Long userId) {
@@ -41,6 +35,13 @@ public class InvoiceServiceImpl implements InvoiceService {
             throw new IllegalArgumentException("Invalid user ID.");
         }
         return invoiceRepository.findInvoicesByContractTenantId(userId);
+    }
+
+    public Optional<Invoice> getInvoiceById(final Long invoiceId) {
+        if (invoiceId == null || invoiceId <= 0) {
+            throw new IllegalArgumentException("Invalid invoice ID.");
+        }
+        return invoiceRepository.findById(invoiceId);
     }
 
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- POST -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
@@ -64,7 +65,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- PUT -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 
     public Invoice updateInvoicePaidStatus(final Long id, final InvoiceStatus status) {
-        final Invoice invoice = getInvoiceById(id);
+        final Invoice invoice = getInvoiceById(id).orElseThrow(() -> new RuntimeException("Invoice with ID " + id + " not found."));
         invoice.setStatus(status);
         return invoiceRepository.save(invoice);
     }

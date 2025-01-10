@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/contracts/**", "/api/invoices/**").authenticated()
 
                 // Admin-only endpoints
+                .requestMatchers("/api/users", "/api/properties").hasRole("ADMIN")
                 .requestMatchers("/api/users/**", "/api/properties/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/contracts/**", "/api/invoices/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/contracts/**", "/api/invoices/**").hasRole("ADMIN")

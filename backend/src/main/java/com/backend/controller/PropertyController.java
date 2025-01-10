@@ -3,8 +3,6 @@ package com.backend.controller;
 import com.backend.model.Property;
 import com.backend.service.PropertyServiceImpl;
 import jakarta.validation.Valid;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +24,13 @@ public class PropertyController {
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- GET -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     @GetMapping("/count")
-    public Integer getNumberOfProperties() {
-        return propertyService.getNumberOfProperties();
+    public ResponseEntity<Integer> getNumberOfProperties() {
+        return ResponseEntity.ok(propertyService.getNumberOfProperties());
     }
 
     @GetMapping
-    public List<Property> getListOfProperties() {
-        return propertyService.getAllProperties();
+    public ResponseEntity<List<Property>> getListOfProperties() {
+        return ResponseEntity.ok(propertyService.getAllProperties());
     }
 
     @GetMapping("/{id}")
@@ -55,14 +53,11 @@ public class PropertyController {
     @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Property> updateProperty(
         final @PathVariable Long id,
-        @RequestPart("property") @Valid Property updatedProperty,
+        @RequestPart("property") @Valid Property requestProperty,
         @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
     ) {
-        try {
-            return ResponseEntity.ok(propertyService.updateProperty(id, updatedProperty, imageFile));
-        } catch (final RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        final Property updatedProperty = propertyService.updateProperty(id, requestProperty, imageFile);
+        return ResponseEntity.ok(updatedProperty);
     }
 
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DELETE -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */

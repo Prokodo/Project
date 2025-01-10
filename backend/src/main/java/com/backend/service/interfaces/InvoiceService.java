@@ -6,11 +6,12 @@ import com.backend.model.requests.InvoiceRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public interface InvoiceService {
-    List<Invoice> getAllInvoices();
-    Invoice getInvoiceById(Long id);
+    List<Invoice> getListOfInvoices();
+    Optional<Invoice> getInvoiceById(Long id);
     List<Invoice> getInvoicesByUserId(Long userId);
 
     Invoice createInvoice(InvoiceRequest invoice);

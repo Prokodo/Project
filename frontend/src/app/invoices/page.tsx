@@ -31,7 +31,9 @@ export default async function PropertiesPage(): Promise<ReactElement> {
                                  overflowWrap: "break-word",
                                  transform: "translateX(0)",
                             }}>
-                            If you have any issues with invoices or the app, please contact the admin responsible for your account.
+                            Tip: Need Assistance? <br />
+                            If you encounter any issues with invoices or the application, please reach out to the administrator responsible for your account.
+                            They can assist you with troubleshooting and resolving your concerns promptly.
                         </div>
                     </div>
                 </div>

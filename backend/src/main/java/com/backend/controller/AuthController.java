@@ -1,6 +1,7 @@
 package com.backend.controller;
 
 import com.backend.model.requests.AuthRequest;
+import jakarta.validation.Valid;
 import org.jetbrains.annotations.NotNull;
 import com.backend.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,9 +50,9 @@ public class AuthController {
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- POST -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(final @NotNull@RequestBody AuthRequest request) {
+    public ResponseEntity<?> login(final @NotNull@RequestBody @Valid AuthRequest request) {
         final Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.username(), request.password())
+            new UsernamePasswordAuthenticationToken(request.username(), request.password())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return ResponseEntity.ok(Map.of("token", jwtTokenProvider.generateToken(authentication)));

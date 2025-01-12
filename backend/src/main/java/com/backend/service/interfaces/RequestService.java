@@ -1,7 +1,8 @@
 package com.backend.service.interfaces;
 
 import com.backend.model.Request;
-import com.backend.model.enums.RequestStatus;
+import com.backend.model.requests.RequestRequest;
+import com.backend.model.requests.RequestStatusRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,8 +14,7 @@ public interface RequestService {
      List<Request> getListOfRequestsByUserId(Long userId);
      List<Request> getListOfRequestsByPropertyId(Long propertyId);
 
-     void deleteRequest(Long id);
      Request createRequest(Request request);
-     Request updateRequest(Long id, Request updatedRequest);
-     Request updateRequestStatus(Long id, RequestStatus status);
+     Request updateRequest(Long id, RequestRequest updatedRequest);
+     Request updateRequestStatus(Long id, RequestStatusRequest status);
 }

@@ -4,6 +4,7 @@ import com.backend.errors.UserNotFoundException;
 import com.backend.model.User;
 import com.backend.model.requests.RegisterRequest;
 import com.backend.service.interfaces.UserService;
+import jakarta.validation.Valid;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,14 +26,14 @@ public class UserController {
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- GET -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     @GetMapping("/tenants")
-    public ResponseEntity<? extends Object> getAllTenants() {
+    public ResponseEntity<?> getAllTenants() {
         return ResponseEntity.ok(userService.getUsersByRole("TENANT"));
     }
 
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- POST -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     @PostMapping("/tenants/register")
-    public ResponseEntity<? extends Object> register(final @NotNull@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<?> register(final @NotNull@RequestBody @Valid RegisterRequest registerRequest) {
         try {
             final User registeredUser = userService.registerUser(registerRequest);
             return ResponseEntity.ok(registeredUser);
@@ -45,7 +46,7 @@ public class UserController {
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- PUT -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 
     @PutMapping("/tenants/{id}")
-    public ResponseEntity<? extends Object> updateUser(final @PathVariable Long id, final @RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<?> updateUser(final @PathVariable Long id, final @RequestBody @Valid RegisterRequest registerRequest) {
         try {
             final User updatedUser = userService.updateUser(id, registerRequest);
             return ResponseEntity.ok(updatedUser);
@@ -61,7 +62,7 @@ public class UserController {
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DELETE -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     @DeleteMapping("/tenants/{id}")
-    public ResponseEntity<? extends Object> deleteUser(final @PathVariable Long id) {
+    public ResponseEntity<?> deleteUser(final @PathVariable Long id) {
         try {
             userService.deleteUserById(id);
             return ResponseEntity.ok(Map.of(

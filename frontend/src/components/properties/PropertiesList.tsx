@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useState} from "react";
+import React, {useMemo, useState} from "react";
 import {Property} from "@/types/types";
 import {getCookie} from "@/utils/cookies";
 import {DataTable} from "@/components/common/DataTable";
@@ -12,9 +12,20 @@ const PropertiesList = () => {
     const { properties, setProperties } = useProperties();
 
     const [error, setError] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState<string>("");
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
     const [propertyToEdit, setPropertyToEdit] = useState<Property | null>(null);
+
+    const openDeleteDialog = (property: Property): void => {
+        setPropertyToEdit(property);
+        setIsDialogOpen(true);
+    };
+
+    const openEditDialog = (property: Property): void => {
+        setPropertyToEdit(property);
+        setIsEditDialogOpen(true);
+    };
 
     const handleDelete = async (): Promise<void> => {
         if (propertyToEdit) {
@@ -47,15 +58,20 @@ const PropertiesList = () => {
         setIsDialogOpen(false);
     };
 
-    const openDeleteDialog = (property: Property): void => {
-        setPropertyToEdit(property);
-        setIsDialogOpen(true);
-    };
-
-    const openEditDialog = (property: Property): void => {
-        setPropertyToEdit(property);
-        setIsEditDialogOpen(true);
-    };
+    const filteredProperties: Property[] = useMemo((): Property[] => {
+        const searchWords: string[] = searchTerm.toLowerCase().split(" ").filter((word: string): boolean => word.trim() !== "");
+        return properties.filter((property: Property): boolean => {
+            return searchWords.every((word: string): boolean => {
+                return (
+                    property.name.toLowerCase().includes(word) ||
+                    property.address.toLowerCase().includes(word) ||
+                    property.type.toLowerCase().includes(word) ||
+                    property.description?.toLowerCase().includes(word) ||
+                    property.price.toString().includes(word)
+                );
+            });
+        });
+    }, [properties, searchTerm]);
 
     const columns = [
         {
@@ -136,6 +152,13 @@ const PropertiesList = () => {
                     {error}
                 </div>
             )}
+
+            <div className="mb-4">
+                <input type="text" placeholder="Search properties..." value={searchTerm}
+                       onChange={(e): void => setSearchTerm(e.target.value)}
+                       className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            </div>
+
             {isEditDialogOpen && (
                 <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative">
@@ -148,7 +171,7 @@ const PropertiesList = () => {
                     </div>
                 </div>
             )}
-            <DataTable columns={columns} data={properties}/>
+            <DataTable columns={columns} data={filteredProperties}/>
         </div>
     );
 };

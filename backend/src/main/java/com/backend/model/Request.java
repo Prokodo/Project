@@ -34,13 +34,13 @@ public class Request {
     @PastOrPresent(message = "Completion date must be in the past or present")
     private LocalDate completionDate;
 
-    @ManyToOne
     @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User tenant;
 
-    @ManyToOne
     @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;
 
@@ -54,10 +54,18 @@ public class Request {
         this.requestDate = requestDate;
     }
 
-    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- GETTERS -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     public Long getId() {
         return id;
+    }
+
+    public User getTenant() {
+        return tenant;
+    }
+
+    public Property getProperty() {
+        return property;
     }
 
     public String getDescription() {
@@ -76,18 +84,10 @@ public class Request {
         return completionDate;
     }
 
-    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SETTERS -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     public void setId(final long id) {
         this.id = id;
-    }
-
-    public void setTenant(final User tenant) {
-        this.tenant = tenant;
-    }
-
-    public void setProperty(final Property property) {
-        this.property = property;
     }
 
     public void setStatus(final RequestStatus status) {

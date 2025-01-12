@@ -1,7 +1,7 @@
 "use client"
 
 import {Tenant} from "@/types/types";
-import React, {useState} from "react";
+import React, {useMemo, useState} from "react";
 import {getCookie} from "@/utils/cookies";
 import {DataTable} from "@/components/common/DataTable";
 import {useTenants} from "@/components/tenants/TenantContext";
@@ -12,6 +12,7 @@ const TenantsList = () => {
     const { tenants, setTenants } = useTenants();
 
     const [error, setError] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState<string>("");
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
     const [tenantToEdit, setTenantToEdit] = useState<Tenant | null>(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
@@ -55,6 +56,21 @@ const TenantsList = () => {
         }
         setIsDialogOpen(false);
     };
+
+    const filteredTenants: Tenant[] = useMemo((): Tenant[] => {
+        const searchWords: string[] = searchTerm.toLowerCase().split(" ").filter((word: string): boolean => word.trim() !== "");
+        return tenants.filter((tenant: Tenant): boolean => {
+            return searchWords.every((word: string): boolean => {
+                return (
+                    tenant.username.toLowerCase().includes(word) ||
+                    tenant.firstName.toLowerCase().includes(word) ||
+                    tenant.surname.toLowerCase().includes(word) ||
+                    tenant.email.toLowerCase().includes(word) ||
+                    tenant.phoneNumber.toLowerCase().includes(word)
+                );
+            });
+        });
+    }, [tenants, searchTerm]);
 
     const columns = [
         {
@@ -109,13 +125,19 @@ const TenantsList = () => {
     ];
 
     return (
-        <div className="max-w-5xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+        <div className="mt-8 mx-4 p-6 bg-white shadow-sm rounded-xl border border-gray-200">
             <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Tenants List</h1>
             {error && (
                 <div className="mb-4 p-3 text-red-800 bg-red-100 border border-red-300 rounded">
                     {error}
                 </div>
             )}
+
+            <div className="mb-4">
+                <input type="text" placeholder="Search tenants..." value={searchTerm}
+                       onChange={(e): void => setSearchTerm(e.target.value)}
+                       className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            </div>
 
             {isEditDialogOpen && (
                 <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
@@ -125,11 +147,12 @@ const TenantsList = () => {
                             ✖
                         </button>
                         <h2 className="text-2xl font-bold text-center mb-6">Create new property</h2>
-                        <TenantsRegistrationForm setIsOpen={setIsEditDialogOpen} tenantToEdit={tenantToEdit || undefined}/>
+                        <TenantsRegistrationForm setIsOpen={setIsEditDialogOpen}
+                                                 tenantToEdit={tenantToEdit || undefined}/>
                     </div>
                 </div>
             )}
-            <DataTable columns={columns} data={tenants} />
+            <DataTable columns={columns} data={filteredTenants}/>
         </div>
     );
 };

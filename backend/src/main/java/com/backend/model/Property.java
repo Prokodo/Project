@@ -18,7 +18,7 @@ public class Property {
     private Long id;
 
     @Lob
-    private Byte[] image;
+    private byte[] image;
 
     @NotBlank(message = "Property name cannot be blank.")
     @Size(max = 100, message = "Property name must be at most 100 characters.")
@@ -78,7 +78,7 @@ public class Property {
         return price;
     }
 
-    public Byte[] getImage() {
+    public byte[] getImage() {
         return image;
     }
 
@@ -116,7 +116,7 @@ public class Property {
         this.price = price;
     }
 
-    public void setImage(final Byte[] image) {
+    public void setImage(final byte[] image) {
         this.image = image;
     }
 

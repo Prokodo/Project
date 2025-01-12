@@ -3,7 +3,6 @@ package com.backend.service;
 import com.backend.model.Property;
 import com.backend.repository.PropertyRepository;
 import com.backend.service.interfaces.PropertyService;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

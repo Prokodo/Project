@@ -127,7 +127,7 @@ const InvoiceList = ({ roles = [] }: { roles: validRoles[] }) => {
         {
             accessorKey: "amount", header: "Amount to pay",
             cell: ({ row }: { row: { original: { amount: number, status: string } } }) => (
-                <div>
+                <div style={{ color: row.original.status === "PAID" ? "green" : "red", fontWeight: "bold" }}>
                     {row.original.status === "PAID" ? 0 : row.original.amount} kč
                 </div>
             ),
@@ -185,10 +185,7 @@ const InvoiceList = ({ roles = [] }: { roles: validRoles[] }) => {
         {
             header: "Actions", accessorKey: "actions",
             cell: ({ row }: { row: { original: Invoice }}) => (
-                <button
-                    onClick={() => generateInvoicePDF(row.original)}
-                    className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700 transition"
-                >
+                <button onClick={() => generateInvoicePDF(row.original)} className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700 transition">
                     Generate PDF
                 </button>
             ),

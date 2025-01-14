@@ -7,6 +7,13 @@ import {InvoiceProvider} from "@/components/invoices/InvoiceContext";
 import {getUserRoles} from "@/services/global";
 import {redirect} from "next/navigation";
 import {HelpCircleIcon} from "lucide-react";
+import {Metadata} from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: 'TenantFlow | Invoices',
+    };
+}
 
 export default async function PropertiesPage(): Promise<ReactElement> {
     const authToken: string | undefined = await getAuthToken();

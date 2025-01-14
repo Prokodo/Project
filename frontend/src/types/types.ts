@@ -18,6 +18,7 @@ interface Request {
     status: RequestStatus;
     requestDate: string;
     completionDate?: string;
+    property: Property;
 }
 
 type RolesResponse = {

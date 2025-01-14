@@ -7,6 +7,17 @@ import {Property, RolesResponse} from "@/types/types";
 import RequestsList from "@/components/requests/RequestsList";
 import {PropertiesProvider} from "@/components/properties/PropertiesContext";
 import {HelpCircleIcon} from "lucide-react";
+import UserRequestList from "@/components/requests/UserRequestList";
+import {RequestProvider} from "@/components/requests/RequestsContext";
+import {fetchRequests} from "@/services/requests";
+import RequestPopupForm from "@/components/requests/RequestPopupForm";
+import {Metadata} from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: 'TenantFlow | Requests',
+    };
+}
 
 export default async function PropertiesPage(): Promise<ReactElement> {
     const authToken: string | undefined = await getAuthToken();
@@ -16,14 +27,7 @@ export default async function PropertiesPage(): Promise<ReactElement> {
     }
 
     const isAdmin: boolean = roles.roles.includes("ROLE_ADMIN");
-    if (!isAdmin) {
-        return (
-            <>
-            </>
-        )
-    }
 
-    const properties: Property[] = await fetchProperties(authToken) || [];
     return (
         <main className="min-h-screen bg-gray-50">
             <header className="bg-blue-600 text-white py-4 shadow-md">
@@ -51,9 +55,16 @@ export default async function PropertiesPage(): Promise<ReactElement> {
             </header>
 
             <section className="mx-auto px-4 py-6">
-                <PropertiesProvider initialProperties={properties}>
-                    <RequestsList roles={roles.roles}/>
-                </PropertiesProvider>
+                {isAdmin?
+                    <PropertiesProvider initialProperties={await fetchProperties(authToken) || []}>
+                        <RequestsList roles={roles.roles}/>
+                    </PropertiesProvider>
+                    :
+                    <RequestProvider initialRequests={await fetchRequests(authToken) || []}>
+                        <RequestPopupForm properties={await fetchProperties(authToken) || []} />
+                        <UserRequestList />
+                    </RequestProvider>
+                }
             </section>
         </main>
     );

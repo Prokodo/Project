@@ -11,10 +11,11 @@ public class Cors {
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
-            public void addCorsMappings(final CorsRegistry registry) {
+            public void addCorsMappings(final @NotNull CorsRegistry registry) {
                 registry.addMapping("/api/**")               // Apply CORS rules to all API routes
                         .allowedOrigins("http://localhost:3000")        // Allow requests from frontend
                         .allowedMethods("GET", "POST", "PUT", "DELETE") // Allow main HTTP methods
+                        .allowedHeaders("Content-Type", "X-CSRF-TOKEN")
                         .allowedHeaders("*")                            // Allow all headers
                         .allowCredentials(true);                        // Allow cookies/auth headers
             }

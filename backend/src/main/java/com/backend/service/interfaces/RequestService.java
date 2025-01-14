@@ -11,7 +11,6 @@ import java.util.List;
 public interface RequestService {
      Request getRequestById(Long id);
      List<Request> getListOfRequests();
-     List<Request> getListOfRequestsByUserId(Long userId);
      List<Request> getListOfRequestsByPropertyId(Long propertyId);
 
      Request createRequest(Request request);

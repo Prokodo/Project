@@ -8,6 +8,13 @@ import {PropertiesProvider} from "@/components/properties/PropertiesContext";
 import {getUserRoles} from "@/services/global";
 import {redirect, unauthorized} from "next/navigation";
 import {HelpCircleIcon} from "lucide-react";
+import {Metadata} from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: 'TenantFlow | Properties',
+    };
+}
 
 export default async function PropertiesPage(): Promise<ReactElement> {
     const authToken: string | undefined = await getAuthToken();

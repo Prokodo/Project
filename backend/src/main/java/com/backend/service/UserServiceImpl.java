@@ -7,7 +7,6 @@ import com.backend.repository.UserRepository;
 import com.backend.security.model.CustomUserDetails;
 import com.backend.model.requests.RegisterRequest;
 import com.backend.service.interfaces.UserService;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,8 +20,8 @@ import java.util.stream.Stream;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserServiceImpl(final UserRepository userRepository, final PasswordEncoder passwordEncoder) {
@@ -30,40 +29,14 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Override
-    public void save(final User user) {
-        userRepository.save(user);
-    }
-
-    @Override
-    public void deleteUserById(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException("User with ID " + id + " not found");
-        }
-        userRepository.deleteById(id);
-    }
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- GET -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     @Override
     public List<User> getUsersByRole(final String role) {
         return userRepository.findByRole(role);
     }
 
-    public User updateUser(long id, RegisterRequest registerRequest) {
-        // Find the user by ID
-        User existingUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found"));
-
-        // Update fields based on the RegisterRequest
-        existingUser.setUsername(registerRequest.username());
-        existingUser.setPassword(passwordEncoder.encode(registerRequest.password()));
-        existingUser.setRole(registerRequest.role());
-        existingUser.setFirstName(registerRequest.firstName());
-        existingUser.setSurname(registerRequest.surname());
-        existingUser.setEmail(registerRequest.email());
-        existingUser.setPhoneNumber(registerRequest.phoneNumber());
-
-        // Save the updated user to the database
-        return userRepository.save(existingUser);
-    }
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- POST -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     public User registerUser(final RegisterRequest registerRequest) {
         return registerUser(
@@ -80,18 +53,40 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("Username already exists.");
         }
-
         if (Stream.of(Role.values()).noneMatch(r -> r.name().equalsIgnoreCase(role))) {
             final String allowedRoles = Stream.of(Role.values()).map(Enum::name).collect(Collectors.joining(", "));
             throw new IllegalArgumentException("Invalid role. Allowed roles are: " + allowedRoles);
         }
-
         final User user = new User(username, passwordEncoder.encode(password), firstName, surname, email, phoneNumber, role.toUpperCase());
         userRepository.save(user);
         return user;
     }
 
-    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- PUT -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
+    public User updateUser(final Long id, final RegisterRequest registerRequest) {
+        final User existingUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found"));
+        existingUser.setUsername(registerRequest.username());
+        existingUser.setPassword(passwordEncoder.encode(registerRequest.password()));
+        existingUser.setRole(registerRequest.role());
+        existingUser.setFirstName(registerRequest.firstName());
+        existingUser.setSurname(registerRequest.surname());
+        existingUser.setEmail(registerRequest.email());
+        existingUser.setPhoneNumber(registerRequest.phoneNumber());
+        return userRepository.save(existingUser);
+    }
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DELETE -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
+    @Override
+    public void deleteUserById(final Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException("User with ID " + id + " not found");
+        }
+        userRepository.deleteById(id);
+    }
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- Auth -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     @Override
     public CustomUserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {

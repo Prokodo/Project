@@ -4,7 +4,6 @@ import {getCookie} from "@/utils/cookies";
 import {validRoles} from "@/services/global";
 import {Property, Request} from "@/types/types";
 import React, {ChangeEvent, JSX, useMemo, useState} from "react";
-import RequestsForm from "@/components/requests/RequestsForm";
 import {useProperties} from "@/components/properties/PropertiesContext";
 
 const RequestsList = ({ roles=[] }: { roles: validRoles[] }): JSX.Element => {
@@ -12,16 +11,9 @@ const RequestsList = ({ roles=[] }: { roles: validRoles[] }): JSX.Element => {
 
     const isAdmin: boolean = roles.includes("ROLE_ADMIN");
     const [searchTerm, setSearchTerm] = useState<string>("");
-    const [isRequestFormOpen, setIsRequestFormOpen] = useState(false);
     const [filterStatus, setFilterStatus] = useState<string | null>(null);
     const [requests, setRequests] = useState<Record<number, Request[]>>({});
     const [expandedPropertyId, setExpandedPropertyId] = useState<number | null>(null);
-    const [propertyForRequest, setPropertyForRequest] = useState<Property | null>(null);
-
-    const openRequestForm = (property: Property): void => {
-        setPropertyForRequest(property);
-        setIsRequestFormOpen(true);
-    };
 
     const filteredRequests = (propertyId: number): Request[] => {
         if (!filterStatus) return requests[propertyId] || [];
@@ -121,11 +113,6 @@ const RequestsList = ({ roles=[] }: { roles: validRoles[] }): JSX.Element => {
                                 <button className="text-gray-500">
                                     {expandedPropertyId === property.id ? "Hide" : "Show"} Requests
                                 </button>
-
-                                <button className="bg-blue-500 text-white px-3 py-2 rounded"
-                                        onClick={() => openRequestForm(property)}>
-                                    Add Request
-                                </button>
                             </div>
 
                             {expandedPropertyId === property.id && (
@@ -218,14 +205,6 @@ const RequestsList = ({ roles=[] }: { roles: validRoles[] }): JSX.Element => {
                     ))}
                 </div>
             </div>
-
-            {isRequestFormOpen && propertyForRequest && (
-                <div className="fixed inset-0  z-10 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white p-6 rounded shadow-md w-96">
-                        <RequestsForm property={propertyForRequest} setIsOpen={setIsRequestFormOpen}/>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

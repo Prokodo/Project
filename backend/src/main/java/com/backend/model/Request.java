@@ -39,8 +39,7 @@ public class Request {
     @JoinColumn(name = "user_id", nullable = false)
     private User tenant;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;
 

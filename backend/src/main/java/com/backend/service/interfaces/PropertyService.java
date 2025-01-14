@@ -9,10 +9,12 @@ import java.util.Optional;
 
 @Service
 public interface PropertyService {
-    List<Property> getAllProperties();
     Integer getNumberOfProperties();
-    Optional<Property> getPropertyById(long id);
+    List<Property> getAllProperties();
+    Optional<Property> getPropertyById(Long id);
+    List<Property> getPropertiesByUserId(Long userId);
+
+    void deleteProperty(Long id);
     Property saveProperty(Property property);
-    Property updateProperty(long id, Property updatedProperty, MultipartFile imageFile);
-    void deleteProperty(long id);
+    Property updateProperty(Long id, Property updatedProperty, MultipartFile imageFile);
 }

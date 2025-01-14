@@ -6,33 +6,35 @@ import {useForm} from "react-hook-form";
 import {getCookie} from "@/utils/cookies";
 import {zodResolver} from "@hookform/resolvers/zod";
 import React, { FC, Dispatch, SetStateAction } from "react";
-import {useProperties} from "@/components/properties/PropertiesContext";
+import {useRequests} from "@/components/requests/RequestsContext";
 
 const requestSchema = z.object({
     description: z.string().min(10, "Description is required").max(255, "Description is too long"),
     status: z.enum(["REQUESTED", "IN_PROGRESS", "COMPLETED", "REJECTED"]),
     requestDate: z.string().min(1, "Request date is required"),
+    propertyId: z.string().nonempty("Please select a property"),
 });
 
 type RequestFormProps = {
     setIsOpen: Dispatch<SetStateAction<boolean>>;
-    property: Property;
+    properties: Property[];
 };
 
-const RequestsForm: FC<RequestFormProps> = ({ setIsOpen, property }) => {
-    const { addRequest } = useProperties();
+const RequestsForm: FC<RequestFormProps> = ({ setIsOpen, properties }) => {
+    const { addRequest } = useRequests();
     const form = useForm<z.infer<typeof requestSchema>>({
         resolver: zodResolver(requestSchema),
         defaultValues: {
             description: "",
             status: "REQUESTED",
             requestDate: new Date().toISOString().split("T")[0],
+            propertyId: ""
         },
     });
 
     const onSubmit = async (values: z.infer<typeof requestSchema>) => {
         try {
-            const url: string = `http://localhost:8080/api/requests/${property.id}`;
+            const url: string = `http://localhost:8080/api/requests/${values.propertyId}`;
             const authToken: string = getCookie("authToken") || "";
             const response = await fetch(url, {
                 method: "POST",
@@ -45,7 +47,7 @@ const RequestsForm: FC<RequestFormProps> = ({ setIsOpen, property }) => {
 
             if (response.ok) {
                 const newRequest = await response.json();
-                addRequest(property.id, newRequest);
+                addRequest(newRequest);
                 setIsOpen(false);
             } else {
                 alert("Failed to add request.");
@@ -58,8 +60,28 @@ const RequestsForm: FC<RequestFormProps> = ({ setIsOpen, property }) => {
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div>
+                <label className="block text-sm font-medium text-gray-700">Property</label>
+                <select{...form.register("propertyId")} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    <option value="" disabled>
+                        Select a property
+                    </option>
+                    {properties.map((property) => (
+                        <option key={property.id} value={property.id}>
+                            {property.name}
+                        </option>
+                    ))}
+                </select>
+                {form.formState.errors.propertyId && (
+                    <p className="text-red-500 text-sm">
+                        {form.formState.errors.propertyId.message}
+                    </p>
+                )}
+            </div>
+
+            <div>
                 <label className="block text-sm font-medium text-gray-700">Description</label>
-                <textarea {...form.register("description")} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
+                <textarea {...form.register("description")}
+                          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
                 {form.formState.errors.description && (
                     <p className="text-red-500 text-sm">
                         {form.formState.errors.description.message}

@@ -1,8 +1,11 @@
 package com.backend.controller;
 
 import com.backend.model.Property;
+import com.backend.security.SecurityUtils;
+import com.backend.security.model.CustomUserPrincipal;
 import com.backend.service.PropertyServiceImpl;
 import jakarta.validation.Valid;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +33,11 @@ public class PropertyController {
 
     @GetMapping
     public ResponseEntity<List<Property>> getListOfProperties() {
-        return ResponseEntity.ok(propertyService.getAllProperties());
+        final @NotNull CustomUserPrincipal user = SecurityUtils.getCurrentUser();
+        if (SecurityUtils.isAdmin(user)) {
+            return ResponseEntity.ok(propertyService.getAllProperties());
+        }
+        return ResponseEntity.ok(propertyService.getPropertiesByUserId(user.userId()));
     }
 
     @GetMapping("/{id}")

@@ -29,10 +29,6 @@ public class RequestServiceImpl implements RequestService {
         return requestRepository.findById(id).orElseThrow(() -> new RuntimeException("Request not found with ID " + id));
     }
 
-    public List<Request> getListOfRequestsByUserId(final Long userId) {
-        return requestRepository.findAll();
-    }
-
     public List<Request> getListOfRequestsByPropertyId(final Long propertyId) {
         return requestRepository.findByPropertyId(propertyId);
     }

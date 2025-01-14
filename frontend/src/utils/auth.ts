@@ -1,7 +1,4 @@
 import {cookies} from "next/headers";
-import {AuthorityResponse} from "@/types/types";
-import {redirect, unauthorized} from "next/navigation";
-import {hasAuthority, validRoles} from "@/services/global";
 import {ReadonlyRequestCookies} from "next/dist/server/web/spec-extension/adapters/request-cookies";
 
 async function getAuthToken(): Promise<string | undefined> {
@@ -9,11 +6,21 @@ async function getAuthToken(): Promise<string | undefined> {
     return cookieStore.get("authToken")?.value;
 }
 
-async function checkUserAuthority(authToken: string | undefined, requiredRole: validRoles): Promise<AuthorityResponse | never> {
-    if (!authToken) {
-        redirect('/login');
-    }
-
+interface CSRFToken {
+    parameterName: string,
+    headerName: string,
+    token: string,
 }
 
-export {getAuthToken, checkUserAuthority};
+async function getCsrfToken(): Promise<CSRFToken> {
+    const response = await fetch('http://localhost:8080/api/auth/csrf-token', {
+        credentials: 'include',
+    });
+    if (!response.ok) {
+        throw new Error(response.statusText || 'Failed to fetch CSRF token');
+    }
+    return await response.json();
+}
+
+export type { CSRFToken }
+export {getAuthToken, getCsrfToken};

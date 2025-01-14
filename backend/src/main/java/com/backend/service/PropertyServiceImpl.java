@@ -30,13 +30,18 @@ public class PropertyServiceImpl implements PropertyService {
         return propertyRepository.findAll();
     }
 
-    public Optional<Property> getPropertyById(final long id) {
+    public Optional<Property> getPropertyById(final Long id) {
         return propertyRepository.findById(id);
+    }
+
+    @Override
+    public List<Property> getPropertiesByUserId(final Long userId) {
+        return propertyRepository.findPropertiesByContractsTenantId(userId);
     }
 
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
-    public void deleteProperty(final long id) {
+    public void deleteProperty(final Long id) {
         propertyRepository.deleteById(id);
     }
 
@@ -75,7 +80,7 @@ public class PropertyServiceImpl implements PropertyService {
         property.setDescription(updatedProperty.getDescription());
     }
 
-    public Property updateProperty(final long id, final Property updatedProperty, final MultipartFile imageFile) {
+    public Property updateProperty(final Long id, final Property updatedProperty, final MultipartFile imageFile) {
         return propertyRepository.findById(id).map(property -> {
             updatePropertyDetails(property, updatedProperty);
             updatePropertyImage(property, imageFile);

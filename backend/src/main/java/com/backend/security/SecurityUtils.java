@@ -12,6 +12,10 @@ public class SecurityUtils {
         return principal.authorities().stream().anyMatch(role -> "ROLE_ADMIN".equals(role.getAuthority()));
     }
 
+    public static boolean isPrivileged(final @NotNull CustomUserPrincipal principal) {
+        return principal.authorities().stream().anyMatch(role -> "ROLE_ADMIN".equals(role.getAuthority()) || "ROLE_MANAGER".equals(role.getAuthority()));
+    }
+
     public static @NotNull CustomUserPrincipal getCurrentUser() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserPrincipal principal)) {

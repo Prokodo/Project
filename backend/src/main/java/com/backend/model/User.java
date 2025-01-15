@@ -30,7 +30,7 @@ public class User {
 
     @Column(nullable = false)
     @NotBlank(message = "Role is mandatory")
-    @Pattern(regexp = "(ADMIN|TENANT)", message = "Role must be either ADMIN or TENANT")
+    @Pattern(regexp = "(ADMIN|TENANT|MANAGER)", message = "Role must be either ADMIN or TENANT")
     private String role;
 
     @Column(nullable = false)

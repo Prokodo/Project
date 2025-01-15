@@ -29,7 +29,7 @@ public class InvoiceController {
     @GetMapping
     public List<Invoice> getAllInvoices() {
         final @NotNull CustomUserPrincipal user = SecurityUtils.getCurrentUser();
-        if (SecurityUtils.isAdmin(user)) {
+        if (SecurityUtils.isPrivileged(user)) {
             return invoiceService.getListOfInvoices();
         }
         return invoiceService.getInvoicesByUserId(user.userId());

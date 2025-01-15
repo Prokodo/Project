@@ -14,21 +14,21 @@ import {getCookie} from "@/utils/cookies";
 const registrationSchema = z.object({
     username: z.string().nonempty("Username is required!"),
     password: z.string().min(6, "Password must be at least 6 characters!"),
-    role: z.enum(["ADMIN", "TENANT"], { required_error: "Role is required!" }),
+    role: z.enum(["MANAGER", "TENANT"], { required_error: "Role is required!" }),
     firstName: z.string().nonempty("First name is required!"),
     surname: z.string().nonempty("Second name is required!"),
     email: z.string().email("Invalid email address!"),
     phoneNumber: z.string().regex(/^\+420(\s?\d){9}$|^(\s?\d){9}$/, "Phone number must be in the format '+420123456789' or '123456789'"),
 });
 
-const TenantsRegistrationForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, tenantToEdit?: Tenant }> = ({ setIsOpen, tenantToEdit }) => {
+const TenantsRegistrationForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, tenantToEdit?: Tenant, isAdmin: boolean }> = ({ setIsOpen, tenantToEdit, isAdmin }) => {
     const { addTenant, editTenant } = useTenants();
     const form = useForm<z.infer<typeof registrationSchema>>({
         resolver: zodResolver(registrationSchema),
         defaultValues: {
             username: tenantToEdit?.username || "",
             password: "",
-            role: "TENANT",
+            role: tenantToEdit?.role,
             firstName: tenantToEdit?.firstName || "",
             surname: tenantToEdit?.surname || "",
             email: tenantToEdit?.email || "",
@@ -125,21 +125,33 @@ const TenantsRegistrationForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>
                     </FormItem>
                 )}/>
 
-                <FormField
-                    control={form.control}
-                    name="phoneNumber"
-                    render={({field}) => (
+                <FormField control={form.control} name="phoneNumber" render={({field}) => (
+                    <FormItem>
+                        <FormLabel>Phone Number</FormLabel>
+                        <FormControl>
+                            <Input placeholder="Enter phone number" {...field} />
+                        </FormControl>
+                        <FormMessage/>
+                    </FormItem>
+                )} />
+
+                {isAdmin ?
+                    <FormField control={form.control} name="role" render={({field}) => (
                         <FormItem>
-                            <FormLabel>Phone Number</FormLabel>
+                            <FormLabel>User role </FormLabel>
                             <FormControl>
-                                <Input placeholder="Enter phone number" {...field} />
+                                <select {...field} disabled={!isAdmin} className="border rounded p-2">
+                                    <option value="TENANT">Tenant</option>
+                                    <option value="MANAGER">Manager</option>
+                                </select>
                             </FormControl>
                             <FormMessage/>
                         </FormItem>
-                    )}
-                />
+                    )}/>
+                    :
+                    <input type="hidden" value="TENANT" {...form.register("role")} />
+                }
 
-                <input type="hidden" value={"TENANT"} {...form.register("role")} />
                 <Button type="submit">Register</Button>
             </form>
         </Form>

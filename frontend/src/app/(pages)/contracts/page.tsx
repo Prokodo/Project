@@ -9,7 +9,7 @@ import {TenantsProvider} from "@/components/tenants/TenantContext";
 import {ContractProvider} from "@/components/contracts/ContractContext";
 import ContractPopupForm from "@/components/contracts/ContractPopupForm";
 import {PropertiesProvider} from "@/components/properties/PropertiesContext";
-import {getUserRoles} from "@/services/global";
+import {getUserRoles, ValidRoles} from "@/services/global";
 import {redirect} from "next/navigation";
 import {HelpCircleIcon} from "lucide-react";
 import {Metadata} from "next";
@@ -22,16 +22,16 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PropertiesPage(): Promise<ReactElement> {
     const authToken: string | undefined = await getAuthToken();
-    const roles: RolesResponse | undefined = await getUserRoles(authToken);
-    if (!roles?.loggedIn) {
+    const authResponse: RolesResponse | undefined = await getUserRoles(authToken);
+    if (!authResponse?.loggedIn) {
         redirect('/login');
     }
 
-    const isAdmin: boolean = roles.roles.includes("ROLE_ADMIN");
+    const isPrivileged: boolean = authResponse?.roles?.some((role: ValidRoles): boolean => ["ROLE_ADMIN", "ROLE_MANAGER"].includes(role)) || false;
     const fetchData = {
         contracts: (): Promise<Contract[] | undefined> => fetchContracts(authToken),
-        tenants: isAdmin ? (): Promise<Tenant[] | undefined> => fetchTenants(authToken) : (): Promise<Tenant[]> => Promise.resolve([] as Tenant[]),
-        properties: isAdmin ? (): Promise<Property[] | undefined> => fetchProperties(authToken) : (): Promise<Property[]> => Promise.resolve([] as Property[])
+        tenants: isPrivileged ? (): Promise<Tenant[] | undefined> => fetchTenants(authToken) : (): Promise<Tenant[]> => Promise.resolve([] as Tenant[]),
+        properties: isPrivileged ? (): Promise<Property[] | undefined> => fetchProperties(authToken) : (): Promise<Property[]> => Promise.resolve([] as Property[])
     };
 
     const [tenants, contracts, properties] = await Promise.all([
@@ -67,8 +67,8 @@ export default async function PropertiesPage(): Promise<ReactElement> {
                 <PropertiesProvider initialProperties={properties || []}>
                     <TenantsProvider initialTenants={tenants || []}>
                         <ContractProvider initialContracts={contracts || []}>
-                            {roles.roles.includes("ROLE_ADMIN") && <ContractPopupForm/>}
-                            <ContractList roles={roles.roles}/>
+                            {isPrivileged && <ContractPopupForm/>}
+                            <ContractList isPrivileged={isPrivileged} />
                         </ContractProvider>
                     </TenantsProvider>
                 </PropertiesProvider>

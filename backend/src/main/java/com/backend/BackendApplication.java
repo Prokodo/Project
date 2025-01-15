@@ -1,7 +1,6 @@
 package com.backend;
 
 import com.backend.service.interfaces.UserService;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -21,6 +20,7 @@ public class BackendApplication {
 	public CommandLineRunner demo() {
 		return (args) -> {
 			try {
+				userService.registerUser("manager", "heslo", "Dominik", "Prokop", "email@gmail.com", "+429787787777", "MANAGER");
 				userService.registerUser("admin", "heslo", "Dominik", "Prokop", "email@gmail.com", "+429787787777", "ADMIN");
 				userService.registerUser("user", "heslo", "Dominik", "Prokop", "email@gmail.com", "+429787787777", "TENANT");
 			} catch (final IllegalArgumentException exception) {

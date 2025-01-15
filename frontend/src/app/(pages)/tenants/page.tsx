@@ -5,7 +5,7 @@ import {getAuthToken} from "@/utils/auth";
 import {TenantsProvider} from "@/components/tenants/TenantContext";
 import TenantsList from "@/components/tenants/TenantList";
 import TenantsPopupForm from "@/components/tenants/TenantsPopupForm";
-import {getUserRoles} from "@/services/global";
+import {getUserRoles, ValidRoles} from "@/services/global";
 import {redirect, unauthorized} from "next/navigation";
 import {HelpCircleIcon} from "lucide-react";
 import {Metadata} from "next";
@@ -18,11 +18,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PropertiesPage(): Promise<ReactElement> {
     const authToken: string | undefined = await getAuthToken();
-    const roles: RolesResponse | undefined = await getUserRoles(authToken);
-    if (!roles?.loggedIn) {
+    const authResponse: RolesResponse | undefined = await getUserRoles(authToken);
+    if (!authResponse?.loggedIn) {
         redirect('/login');
     }
-    if (!roles.roles.includes("ROLE_ADMIN")) {
+
+    const isPrivileged: boolean = authResponse?.roles?.some((role: ValidRoles): boolean => ["ROLE_ADMIN", "ROLE_MANAGER"].includes(role)) || false;
+    if (!isPrivileged) {
         unauthorized();
     }
 
@@ -54,8 +56,8 @@ export default async function PropertiesPage(): Promise<ReactElement> {
 
             <section className="mx-auto px-4 py-6">
                 <TenantsProvider initialTenants={tenants}>
-                    <TenantsPopupForm />
-                    <TenantsList />
+                    <TenantsPopupForm isAdmin={authResponse.roles.includes("ROLE_ADMIN")} />
+                    <TenantsList isAdmin={authResponse.roles.includes("ROLE_ADMIN")} />
                 </TenantsProvider>
             </section>
         </main>

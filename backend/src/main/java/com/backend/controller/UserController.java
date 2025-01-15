@@ -3,6 +3,8 @@ package com.backend.controller;
 import com.backend.errors.UserNotFoundException;
 import com.backend.model.User;
 import com.backend.model.requests.RegisterRequest;
+import com.backend.security.SecurityUtils;
+import com.backend.security.model.CustomUserPrincipal;
 import com.backend.service.interfaces.UserService;
 import jakarta.validation.Valid;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +29,10 @@ public class UserController {
 
     @GetMapping("/tenants")
     public ResponseEntity<?> getAllTenants() {
+        final @NotNull CustomUserPrincipal user = SecurityUtils.getCurrentUser();
+        if (SecurityUtils.isAdmin(user)) {
+            return ResponseEntity.ok(userService.getUsersByRole("TENANT", "MANAGER"));
+        }
         return ResponseEntity.ok(userService.getUsersByRole("TENANT"));
     }
 

@@ -1,13 +1,9 @@
 import {getAuthToken} from "@/utils/auth";
 import {RolesResponse} from "@/types/types";
-import {getUserRoles} from "@/services/global";
+import {getUserRoles, ValidRoles} from "@/services/global";
 import LogOutAlert from "@/components/auth/LogOutAlert";
-import {
-    Sidebar, SidebarContent, SidebarFooter,
-    SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
-    SidebarMenu, SidebarMenuButton, SidebarMenuItem,
-} from "@/components/ui/sidebar";
 import {LayoutDashboardIcon, HousePlugIcon, GitPullRequestIcon, ReceiptIcon, FileIcon, UserSearchIcon} from "lucide-react";
+import {Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,} from "@/components/ui/sidebar";
 
 const items = [
     {
@@ -45,19 +41,22 @@ const items = [
 
 export async function AppSidebar() {
     const response: RolesResponse | undefined = await getUserRoles(await getAuthToken());
-    const isAdmin: boolean = response?.roles?.includes("ROLE_ADMIN") || false;
     if (!response?.loggedIn) {
         return <></>;
     }
 
+    const isPrivileged: boolean = response?.roles?.some((role: ValidRoles): boolean => ["ROLE_ADMIN", "ROLE_MANAGER"].includes(role)) || false;
     return (
         <Sidebar>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Application</SidebarGroupLabel>
+                    <SidebarGroupLabel>
+                        Menu | TenantFlow
+                    </SidebarGroupLabel>
+
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {items.filter(item => isAdmin || !item.adminOnly).map((item) => (
+                            {items.filter(item => isPrivileged || !item.adminOnly).map((item) => (
                                 <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton asChild>
                                         <a href={item.url}>
@@ -71,6 +70,7 @@ export async function AppSidebar() {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
+
             <SidebarFooter>
                 <LogOutAlert />
             </SidebarFooter>

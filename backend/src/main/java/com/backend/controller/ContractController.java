@@ -27,7 +27,7 @@ public class ContractController {
     @GetMapping
     public ResponseEntity<List<Contract>> getAllContracts() {
         final CustomUserPrincipal user = SecurityUtils.getCurrentUser();
-        if (SecurityUtils.isAdmin(user)) {
+        if (SecurityUtils.isPrivileged(user)) {
             return ResponseEntity.ok(contractService.getListOfContracts());
         }
         return ResponseEntity.ok(contractService.getContractsByUserId(user.userId()));

@@ -5,7 +5,7 @@ import {getAuthToken} from "@/utils/auth";
 import PropertiesList from "@/components/properties/PropertiesList";
 import PropertyPopupForm from "@/components/properties/PropertyPopupForm";
 import {PropertiesProvider} from "@/components/properties/PropertiesContext";
-import {getUserRoles} from "@/services/global";
+import {getUserRoles, ValidRoles} from "@/services/global";
 import {redirect, unauthorized} from "next/navigation";
 import {HelpCircleIcon} from "lucide-react";
 import {Metadata} from "next";
@@ -18,11 +18,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PropertiesPage(): Promise<ReactElement> {
     const authToken: string | undefined = await getAuthToken();
-    const roles: RolesResponse | undefined = await getUserRoles(authToken);
-    if (!roles?.loggedIn) {
+    const authResponse: RolesResponse | undefined = await getUserRoles(authToken);
+    if (!authResponse?.loggedIn) {
         redirect('/login');
     }
-    if (!roles.roles.includes("ROLE_ADMIN")) {
+
+    const isPrivileged: boolean = authResponse?.roles?.some((role: ValidRoles): boolean => ["ROLE_ADMIN", "ROLE_MANAGER"].includes(role)) || false;
+    if (!isPrivileged) {
         unauthorized();
     }
 

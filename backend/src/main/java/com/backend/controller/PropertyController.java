@@ -34,7 +34,7 @@ public class PropertyController {
     @GetMapping
     public ResponseEntity<List<Property>> getListOfProperties() {
         final @NotNull CustomUserPrincipal user = SecurityUtils.getCurrentUser();
-        if (SecurityUtils.isAdmin(user)) {
+        if (SecurityUtils.isPrivileged(user)) {
             return ResponseEntity.ok(propertyService.getAllProperties());
         }
         return ResponseEntity.ok(propertyService.getPropertiesByUserId(user.userId()));

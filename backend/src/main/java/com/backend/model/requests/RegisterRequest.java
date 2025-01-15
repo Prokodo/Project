@@ -32,6 +32,6 @@ public record RegisterRequest(
     String phoneNumber,
 
     @NotBlank(message = "Role is mandatory")
-    @Pattern(regexp = "(ADMIN|TENANT)", message = "Role must be either ADMIN or TENANT")
+    @Pattern(regexp = "(ADMIN|TENANT|MANAGER)", message = "Role must be either ADMIN or TENANT")
     String role
 ) {}

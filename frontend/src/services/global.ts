@@ -1,6 +1,6 @@
 import {AuthorityResponse, RolesResponse} from "@/types/types";
 
-type validRoles = "ROLE_ADMIN" | "ROLE_USER";
+type ValidRoles = "ROLE_ADMIN" | "ROLE_USER" | "ROLE_MANAGER";
 
 async function getUserRoles(authToken: string | undefined): Promise<RolesResponse | undefined> {
     if (!authToken) {
@@ -27,7 +27,7 @@ async function getUserRoles(authToken: string | undefined): Promise<RolesRespons
     }
 }
 
-async function hasAuthority(authToken: string | undefined, authority: validRoles): Promise<AuthorityResponse | undefined> {
+async function hasAuthority(authToken: string | undefined, authority: ValidRoles): Promise<AuthorityResponse | undefined> {
     if (!authToken) {
         return undefined;
     }
@@ -52,5 +52,5 @@ async function hasAuthority(authToken: string | undefined, authority: validRoles
     }
 }
 
-export type { validRoles };
+export type { ValidRoles };
 export { hasAuthority, getUserRoles };

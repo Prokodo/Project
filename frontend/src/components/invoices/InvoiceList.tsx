@@ -5,11 +5,10 @@ import jsPDF from "jspdf";
 import React, {useState} from "react";
 import {Invoice} from "@/types/types";
 import {getCookie} from "@/utils/cookies";
-import {validRoles} from "@/services/global";
 import {DataTable} from "@/components/common/DataTable";
 import {useInvoices} from "@/components/invoices/InvoiceContext";
 
-const InvoiceList = ({ roles = [] }: { roles: validRoles[] }) => {
+const InvoiceList = ({ isPrivileged }: { isPrivileged: boolean }) => {
     const { invoices, updateInvoiceStatus } = useInvoices();
     const [filterStatus, setFilterStatus] = useState<string | null>(null);
     const [generalError, setGeneralError] = useState<string | null>(null);
@@ -140,7 +139,7 @@ const InvoiceList = ({ roles = [] }: { roles: validRoles[] }) => {
             accessorKey: "status", header: "Status",
             cell: ({ row }: { row: { original: { id: number; status: string; } } }) => (
                 <div className="flex items-center">
-                    {!roles.includes("ROLE_ADMIN") ? (
+                    {!isPrivileged? (
                         <div className="flex items-center space-x-2">
                             {row.original.status === "PAID" ? (
                                 <>

@@ -1,10 +1,10 @@
+import {Metadata} from "next";
+import {redirect} from "next/navigation";
 import {getAuthToken} from "@/utils/auth";
 import {RolesResponse} from "@/types/types";
-import {getUserRoles} from "@/services/global";
-import {redirect} from "next/navigation";
-import {Metadata} from "next";
-import AdminIndexPage from "@/components/index/AdminIndexPage";
+import {getUserRoles, ValidRoles} from "@/services/global";
 import UserIndexPage from "@/components/index/UserIndexPage";
+import AdminIndexPage from "@/components/index/AdminIndexPage";
 
 export async function generateMetadata(): Promise<Metadata> {
     return {
@@ -13,23 +13,21 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 async function Home() {
-  const authToken: string | undefined = await getAuthToken();
-  const roles: RolesResponse | undefined = await getUserRoles(authToken);
-  if (!roles?.loggedIn) {
+    const authToken: string | undefined = await getAuthToken();
+    const authResponse: RolesResponse | undefined = await getUserRoles(authToken);
+    if (!authResponse?.loggedIn) {
     redirect('/login');
-  }
+    }
 
-  const isAdmin: boolean = roles.roles.includes("ROLE_ADMIN");
-
-  return (
+    const isPrivileged: boolean = authResponse?.roles?.some((role: ValidRoles): boolean => ["ROLE_ADMIN", "ROLE_MANAGER"].includes(role)) || false;
+    return (
       <>
-          {isAdmin?
-              <AdminIndexPage/>
-              :
+          {isPrivileged?
+              <AdminIndexPage/> :
               <UserIndexPage/>
           }
       </>
-  );
+    );
 }
 
 export default Home;

@@ -1,12 +1,12 @@
 "use client"
 
 import {getCookie} from "@/utils/cookies";
-import {validRoles} from "@/services/global";
+import {ValidRoles} from "@/services/global";
 import {Property, Request} from "@/types/types";
 import React, {ChangeEvent, JSX, useMemo, useState} from "react";
 import {useProperties} from "@/components/properties/PropertiesContext";
 
-const RequestsList = ({ roles=[] }: { roles: validRoles[] }): JSX.Element => {
+const RequestsList = ({ roles=[] }: { roles: ValidRoles[] }): JSX.Element => {
     const { properties } = useProperties();
 
     const isAdmin: boolean = roles.includes("ROLE_ADMIN");

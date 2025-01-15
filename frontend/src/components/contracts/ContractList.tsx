@@ -1,17 +1,15 @@
 "use client"
 
-import React, {useMemo, useState} from "react";
 import {Contract} from "@/types/types";
 import {getCookie} from "@/utils/cookies";
-import {validRoles} from "@/services/global";
+import React, {useMemo, useState} from "react";
 import {DataTable} from "@/components/common/DataTable";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import ContractForm from "@/components/contracts/ContractsForm";
 import {useContracts} from "@/components/contracts/ContractContext";
 
-const ContractList = ({ roles=[] }: { roles: validRoles[] }) => {
+const ContractList = ({ isPrivileged }: { isPrivileged: boolean }) => {
     const { contracts, setContracts } = useContracts();
-    const isAdmin: boolean = roles.includes("ROLE_ADMIN");
 
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState<string>("");
@@ -119,7 +117,7 @@ const ContractList = ({ roles=[] }: { roles: validRoles[] }) => {
         )},
     ];
 
-    if (isAdmin) {
+    if (isPrivileged) {
         columns.push({
             accessorKey: "actions", header: "Actions",
             cell: ({ row }: { row: { original: Contract } }) => (
@@ -151,7 +149,7 @@ const ContractList = ({ roles=[] }: { roles: validRoles[] }) => {
     return (
         <div className="mt-8 mx-4 p-6 bg-white shadow-sm rounded-xl border border-gray-200">
             <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Contracts List</h1>
-            {isAdmin && (
+            {isPrivileged && (
                 <div className="mb-4">
                     <input type="text" placeholder="Quick Search (Tenant, Property, ID)"
                            value={searchTerm} onChange={(e): void => setSearchTerm(e.target.value)}

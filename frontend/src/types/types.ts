@@ -1,4 +1,4 @@
-import {validRoles} from "@/services/global";
+import {ValidRoles} from "@/services/global";
 
 interface Property {
     id: number;
@@ -22,14 +22,14 @@ interface Request {
 }
 
 type RolesResponse = {
-    roles: validRoles[];
+    roles: ValidRoles[];
     loggedIn: boolean;
 };
 
 type AuthorityResponse = {
     authorized: boolean;
     message: string;
-    roles: validRoles[];
+    roles: ValidRoles[];
 };
 
 interface Tenant {
@@ -39,6 +39,7 @@ interface Tenant {
     surname: string;
     firstName: string;
     phoneNumber: string;
+    role?: "MANAGER" | "TENANT";
 }
 
 interface Contract {

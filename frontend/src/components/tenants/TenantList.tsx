@@ -8,7 +8,7 @@ import {useTenants} from "@/components/tenants/TenantContext";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import TenantsRegistrationForm from "@/components/tenants/TenantsRegistrationForm";
 
-const TenantsList = () => {
+const TenantsList = ({ isAdmin }: { isAdmin: boolean }) => {
     const { tenants, setTenants } = useTenants();
 
     const [error, setError] = useState<string | null>(null);
@@ -126,7 +126,10 @@ const TenantsList = () => {
 
     return (
         <div className="mt-8 mx-4 p-6 bg-white shadow-sm rounded-xl border border-gray-200">
-            <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Tenants List</h1>
+            <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
+                {isAdmin ? "User list" : "Tenant list"}
+            </h1>
+
             {error && (
                 <div className="mb-4 p-3 text-red-800 bg-red-100 border border-red-300 rounded">
                     {error}
@@ -147,8 +150,7 @@ const TenantsList = () => {
                             ✖
                         </button>
                         <h2 className="text-2xl font-bold text-center mb-6">Create new property</h2>
-                        <TenantsRegistrationForm setIsOpen={setIsEditDialogOpen}
-                                                 tenantToEdit={tenantToEdit || undefined}/>
+                        <TenantsRegistrationForm setIsOpen={setIsEditDialogOpen} isAdmin={false} tenantToEdit={tenantToEdit || undefined}/>
                     </div>
                 </div>
             )}

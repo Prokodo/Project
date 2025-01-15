@@ -1,7 +1,6 @@
 package com.backend.security;
 
 import com.backend.security.utils.CustomAccessDeniedHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,17 +13,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 public class SecurityConfig {
+    private final CustomAccessDeniedHandler accessDeniedHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Autowired
-    private CustomAccessDeniedHandler accessDeniedHandler;
-
-
-    public SecurityConfig(final JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(final JwtAuthenticationFilter jwtAuthenticationFilter, final CustomAccessDeniedHandler accessDeniedHandler) {
+        this.accessDeniedHandler = accessDeniedHandler;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
@@ -35,8 +31,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
-        CookieCsrfTokenRepository tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-
         http.cors(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
@@ -46,11 +40,11 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/contracts/**", "/api/invoices/**", "/api/properties").authenticated()
 
                 // Admin-only endpoints
-                .requestMatchers("/api/users", "/api/properties/**").hasRole("ADMIN")
-                .requestMatchers("/api/users/**", "/api/properties/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/contracts/**", "/api/invoices/**", "/api/properties").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/contracts/**", "/api/invoices/**", "/api/properties").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/contracts/**", "/api/invoices/**", "/api/properties").hasRole("ADMIN")
+                .requestMatchers("/api/users", "/api/properties/**").hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers("/api/users/**", "/api/properties/**").hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.PUT, "/api/contracts/**", "/api/invoices/**", "/api/properties").hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.POST, "/api/contracts/**", "/api/invoices/**", "/api/properties").hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.DELETE, "/api/contracts/**", "/api/invoices/**", "/api/properties").hasAnyRole("ADMIN", "MANAGER")
 
                 .anyRequest().authenticated()
             )

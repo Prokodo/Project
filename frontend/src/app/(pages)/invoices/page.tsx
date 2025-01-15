@@ -4,7 +4,7 @@ import {fetchInvoices} from "@/services/invoices";
 import InvoiceList from "@/components/invoices/InvoiceList";
 import {getAuthToken} from "@/utils/auth";
 import {InvoiceProvider} from "@/components/invoices/InvoiceContext";
-import {getUserRoles} from "@/services/global";
+import {getUserRoles, ValidRoles} from "@/services/global";
 import {redirect} from "next/navigation";
 import {HelpCircleIcon} from "lucide-react";
 import {Metadata} from "next";
@@ -17,11 +17,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PropertiesPage(): Promise<ReactElement> {
     const authToken: string | undefined = await getAuthToken();
-    const roles: RolesResponse | undefined = await getUserRoles(authToken);
-    if (!roles?.loggedIn) {
+    const authResponse: RolesResponse | undefined = await getUserRoles(authToken);
+    if (!authResponse?.loggedIn) {
         redirect('/login');
     }
 
+    const isPrivileged: boolean = authResponse?.roles?.some((role: ValidRoles): boolean => ["ROLE_ADMIN", "ROLE_MANAGER"].includes(role)) || false;
     const invoices: Invoice[] = await fetchInvoices(authToken) || [];
     return (
         <main className="min-h-screen bg-gray-50">
@@ -48,7 +49,7 @@ export default async function PropertiesPage(): Promise<ReactElement> {
 
             <section className="mx-auto px-4 py-6">
                 <InvoiceProvider initialInvoices={invoices}>
-                    <InvoiceList roles={roles?.roles || []}/>
+                    <InvoiceList isPrivileged={isPrivileged}/>
                 </InvoiceProvider>
             </section>
         </main>

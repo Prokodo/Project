@@ -101,25 +101,14 @@ const TenantsList = ({ isAdmin }: { isAdmin: boolean }) => {
             id: "actions",
             header: "Actions",
             cell: ({row}: { row: { original: Tenant } }) => (
-                <ConfirmDialog
-                    title="Are you sure?"
-                    description="This action cannot be undone. It will permanently delete the property."
-                    confirmLabel="Delete"
-                    cancelLabel="Cancel"
-                    isOpen={isDialogOpen}
-                    onConfirm={handleDelete}
-                    onCancel={(): void => setIsDialogOpen(false)}
-                    trigger={
-                        <div className="flex space-x-4">
-                            <button onClick={(): void => openEditDialog(row.original)} className="text-blue-600 hover:text-blue-800">
-                                Edit
-                            </button>
-                            <button onClick={(): void => openDeleteDialog(row.original)} className="text-red-600 hover:text-red-800">
-                                Delete
-                            </button>
-                        </div>
-                    }
-                />
+                <div className="flex space-x-4">
+                    <button onClick={(): void => openEditDialog(row.original)} className="text-blue-600 hover:text-blue-800">
+                        Edit
+                    </button>
+                    <button onClick={(): void => openDeleteDialog(row.original)} className="text-red-600 hover:text-red-800">
+                        Delete
+                    </button>
+                </div>
             ),
         }
     ];
@@ -139,8 +128,16 @@ const TenantsList = ({ isAdmin }: { isAdmin: boolean }) => {
             <div className="mb-4">
                 <input type="text" placeholder="Search tenants..." value={searchTerm}
                        onChange={(e): void => setSearchTerm(e.target.value)}
-                       className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                       className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"/>
             </div>
+
+            <ConfirmDialog title="Are you sure?"
+                           confirmLabel="Delete"
+                           cancelLabel="Cancel"
+                           description="This action cannot be undone. It will permanently delete the tenant."
+                           isOpen={isDialogOpen}
+                           onConfirm={handleDelete}
+                           onCancel={(): void => setIsDialogOpen(false)}/>
 
             {isEditDialogOpen && (
                 <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
@@ -149,12 +146,16 @@ const TenantsList = ({ isAdmin }: { isAdmin: boolean }) => {
                                 className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none">
                             ✖
                         </button>
-                        <h2 className="text-2xl font-bold text-center mb-6">Create new property</h2>
-                        <TenantsRegistrationForm setIsOpen={setIsEditDialogOpen} isAdmin={false} tenantToEdit={tenantToEdit || undefined}/>
+                        <h2 className="text-2xl font-bold text-center mb-6">Edit user</h2>
+                        <TenantsRegistrationForm setIsOpen={setIsEditDialogOpen} isAdmin={false}
+                                                 tenantToEdit={tenantToEdit || undefined}/>
                     </div>
                 </div>
             )}
-            <DataTable columns={columns} data={filteredTenants}/>
+
+            <div className="max-h-[710px] overflow-y-auto">
+                <DataTable columns={columns} data={filteredTenants}/>
+            </div>
         </div>
     );
 };

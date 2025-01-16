@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface RequestRepository extends JpaRepository<Request, Long> {
     List<Request> findByPropertyId(Long propertyId);
+    List<Request> findByTenantId(Long userId);
 }

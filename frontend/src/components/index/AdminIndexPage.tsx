@@ -11,7 +11,7 @@ function AdminIndexPage() {
             </header>
 
             <main className="flex-1">
-                <section className="bg-blue-50 py-32 text-center">
+                <section className="bg-blue-50 py-48 text-center">
                     <div className="container mx-auto px-4">
                         <h1 className="text-4xl md:text-6xl font-bold text-blue-600 mb-4">
                             Welcome to TenantManager
@@ -21,8 +21,7 @@ function AdminIndexPage() {
                             Your comprehensive solution for efficient tenant and property management.
                         </p>
 
-                        <a href="#introduction"
-                           className="bg-blue-600 text-white px-6 py-3 rounded-md text-lg shadow-md hover:bg-blue-700">
+                        <a className="bg-blue-600 text-white px-6 py-3 rounded-md text-lg shadow-md hover:bg-blue-700">
                             Discover More
                         </a>
                     </div>
@@ -45,7 +44,7 @@ function AdminIndexPage() {
                 <section id="features" className="py-20 bg-gray-50">
                     <div className="container mx-auto px-4">
                         <h2 className="text-3xl font-bold text-gray-800 text-center mb-12">
-                            Our Features
+                            Main Features
                         </h2>
                         <div className="grid md:grid-cols-3 gap-8">
                             <div
@@ -65,7 +64,7 @@ function AdminIndexPage() {
                                 <div className="text-blue-600 text-4xl mb-4">
                                     🏢
                                 </div>
-                                <h3 className="text-xl font-semibold mb-2">Property Listings</h3>
+                                <h3 className="text-xl font-semibold mb-2">Property listings</h3>
                                 <p className="text-gray-600">
                                     Organize and showcase all your properties with detailed descriptions, images, and
                                     availability status.

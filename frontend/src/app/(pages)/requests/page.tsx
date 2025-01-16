@@ -3,7 +3,7 @@ import {redirect} from "next/navigation";
 import {getAuthToken} from "@/utils/auth";
 import {getUserRoles} from "@/services/global";
 import {fetchProperties} from "@/services/properties";
-import {Property, RolesResponse} from "@/types/types";
+import {RolesResponse} from "@/types/types";
 import RequestsList from "@/components/requests/RequestsList";
 import {PropertiesProvider} from "@/components/properties/PropertiesContext";
 import {HelpCircleIcon} from "lucide-react";

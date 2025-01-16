@@ -1,5 +1,6 @@
 import "../globals.css";
 import React from "react";
+import {Toaster} from "sonner";
 import type {Metadata} from "next";
 import {AppSidebar} from "@/components/sidebar/AppSidebar";
 import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
@@ -20,6 +21,7 @@ export default async function RootLayout({children}: Readonly<{ children: React.
                         {children}
                     </main>
                 </SidebarProvider>
+                <Toaster />
             </body>
         </html>
     );

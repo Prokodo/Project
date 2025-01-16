@@ -28,7 +28,7 @@ const TenantsRegistrationForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>
         defaultValues: {
             username: tenantToEdit?.username || "",
             password: "",
-            role: tenantToEdit?.role,
+            role: tenantToEdit?.role || "TENANT",
             firstName: tenantToEdit?.firstName || "",
             surname: tenantToEdit?.surname || "",
             email: tenantToEdit?.email || "",
@@ -151,8 +151,7 @@ const TenantsRegistrationForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>
                     :
                     <input type="hidden" value="TENANT" {...form.register("role")} />
                 }
-
-                <Button type="submit">Register</Button>
+                <Button type="submit">{tenantToEdit? "Save changes" : "Register"}</Button>
             </form>
         </Form>
     );

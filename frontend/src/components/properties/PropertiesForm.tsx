@@ -10,6 +10,7 @@ import {Dispatch, FC, SetStateAction, useState} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useProperties} from "@/components/properties/PropertiesContext";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {toast} from "sonner";
 
 const formSchema = z.object({
     name: z.string().nonempty("Name is required!"),
@@ -75,6 +76,8 @@ const PropertiesForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, propert
                 if (propertyToEdit) editProperty(data);
                 else addProperty(data);
                 setIsOpen(false);
+
+                toast(propertyToEdit? "Property has been successfully updated." : "New property has been successfully created.");
             } else if (response.status === 400) {
                 const errorData = await response.json();
                 for (const [field, message] of Object.entries(errorData)) {

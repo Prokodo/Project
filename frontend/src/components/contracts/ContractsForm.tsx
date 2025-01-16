@@ -25,11 +25,9 @@ type ContractFormValues = z.infer<typeof contractSchema>;
 
 const ContractForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, contractToEdit?: Contract }> = ({ setIsOpen, contractToEdit }) => {
     const { addContract, editContract } = useContracts();
-    const [loading, setLoading] = useState(false);
     const tenants: Tenant[] = useTenants().tenants;
     const properties: Property[] = useProperties().properties;
     const [generalError, setGeneralError] = useState<string | null>(null);
-
 
     const form = useForm<ContractFormValues>({
         resolver: zodResolver(contractSchema),
@@ -146,8 +144,8 @@ const ContractForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, contractT
                     </FormItem>
                 )} />
 
-                <Button type="submit" disabled={loading}>
-                    {loading ? "Submitting..." : "Submit"}
+                <Button type="submit">
+                    Submit
                 </Button>
             </form>
         </Form>

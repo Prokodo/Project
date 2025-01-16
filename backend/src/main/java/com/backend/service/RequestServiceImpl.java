@@ -29,6 +29,10 @@ public class RequestServiceImpl implements RequestService {
         return requestRepository.findById(id).orElseThrow(() -> new RuntimeException("Request not found with ID " + id));
     }
 
+    public List<Request> getListOfRequestsByUserId(final Long userId) {
+        return requestRepository.findByTenantId(userId);
+    }
+
     public List<Request> getListOfRequestsByPropertyId(final Long propertyId) {
         return requestRepository.findByPropertyId(propertyId);
     }
@@ -51,5 +55,11 @@ public class RequestServiceImpl implements RequestService {
         final Request updatedRequest = getRequestById(id);
         updatedRequest.setStatus(request.status());
         return requestRepository.save(updatedRequest);
+    }
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DELETE -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-== */
+
+    public void deleteRequest(final Long id) {
+        requestRepository.deleteById(id);
     }
 }

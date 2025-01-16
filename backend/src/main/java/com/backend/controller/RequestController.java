@@ -37,8 +37,12 @@ public class RequestController {
     /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- GET -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
     @GetMapping
-    public List<Request> getListOfRequests() {
-        return requestService.getListOfRequests();
+    public ResponseEntity<List<Request>> getListOfRequests() {
+        final @NotNull CustomUserPrincipal user = SecurityUtils.getCurrentUser();
+        if (SecurityUtils.isPrivileged(user)) {
+            return ResponseEntity.ok(requestService.getListOfRequests());
+        }
+        return ResponseEntity.ok(requestService.getListOfRequestsByUserId(user.userId()));
     }
 
     @GetMapping("/users/{id}")
@@ -79,5 +83,16 @@ public class RequestController {
     public ResponseEntity<Request> updateRequestStatus(final @PathVariable Long id, final @RequestBody @Valid RequestStatusRequest request) {
         final Request updatedRequest = requestService.updateRequestStatus(id, request);
         return ResponseEntity.ok(updatedRequest);
+    }
+
+    /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DELETE -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProperty(final @PathVariable Long id) {
+        if (requestService.getRequestById(id) != null) {
+            requestService.deleteRequest(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

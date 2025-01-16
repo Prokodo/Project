@@ -7,6 +7,7 @@ import {getCookie} from "@/utils/cookies";
 import {zodResolver} from "@hookform/resolvers/zod";
 import React, { FC, Dispatch, SetStateAction } from "react";
 import {useRequests} from "@/components/requests/RequestsContext";
+import {toast} from "sonner";
 
 const requestSchema = z.object({
     description: z.string().min(10, "Description is required").max(255, "Description is too long"),
@@ -49,6 +50,8 @@ const RequestsForm: FC<RequestFormProps> = ({ setIsOpen, properties }) => {
                 const newRequest = await response.json();
                 addRequest(newRequest);
                 setIsOpen(false);
+
+                toast("New request has been successfully created.");
             } else {
                 alert("Failed to add request.");
             }
@@ -61,7 +64,7 @@ const RequestsForm: FC<RequestFormProps> = ({ setIsOpen, properties }) => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div>
                 <label className="block text-sm font-medium text-gray-700">Property</label>
-                <select{...form.register("propertyId")} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                <select{...form.register("propertyId")} className="mt-1 block w-full border-gray-300 p-2 rounded-md border">
                     <option value="" disabled>
                         Select a property
                     </option>
@@ -71,6 +74,7 @@ const RequestsForm: FC<RequestFormProps> = ({ setIsOpen, properties }) => {
                         </option>
                     ))}
                 </select>
+
                 {form.formState.errors.propertyId && (
                     <p className="text-red-500 text-sm">
                         {form.formState.errors.propertyId.message}
@@ -80,8 +84,7 @@ const RequestsForm: FC<RequestFormProps> = ({ setIsOpen, properties }) => {
 
             <div>
                 <label className="block text-sm font-medium text-gray-700">Description</label>
-                <textarea {...form.register("description")}
-                          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
+                <textarea {...form.register("description")} className="mt-1 block w-full min-h-48 border-gray-300 rounded-md border"></textarea>
                 {form.formState.errors.description && (
                     <p className="text-red-500 text-sm">
                         {form.formState.errors.description.message}

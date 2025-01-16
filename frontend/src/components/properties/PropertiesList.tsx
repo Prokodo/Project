@@ -119,34 +119,21 @@ const PropertiesList = () => {
             id: "actions",
             header: "Actions",
             cell: ({ row }: { row: { original: Property } }) => (
-                <ConfirmDialog
-                    title="Are you sure?"
-                    description="This action cannot be undone. It will permanently delete the property."
-                    confirmLabel="Delete"
-                    cancelLabel="Cancel"
-                    isOpen={isDialogOpen}
-                    onConfirm={handleDelete}
-                    onCancel={(): void => setIsDialogOpen(false)}
-                    trigger={
-                        <div className="flex space-x-4">
-                            <button onClick={(): void => openEditDialog(row.original)}
-                                    className="text-blue-600 hover:text-blue-800">
-                                Edit
-                            </button>
-                            <button onClick={(): void => openDeleteDialog(row.original)}
-                                    className="text-red-600 hover:text-red-800">
-                                Delete
-                            </button>
-                        </div>
-                    }
-                />
+                <div className="flex space-x-4">
+                    <button onClick={(): void => openEditDialog(row.original)} className="text-blue-600 hover:text-blue-800">
+                        Edit
+                    </button>
+                    <button onClick={(): void => openDeleteDialog(row.original)} className="text-red-600 hover:text-red-800">
+                        Delete
+                    </button>
+                </div>
             ),
         },
     ];
 
     return (
         <div className="mt-8 mx-4 p-6 bg-white shadow-sm rounded-xl border border-gray-200">
-            <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Properties List</h1>
+            <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Properties list</h1>
             {error && (
                 <div className="mb-4 p-3 text-red-800 bg-red-100 border border-red-300 rounded">
                     {error}
@@ -156,8 +143,16 @@ const PropertiesList = () => {
             <div className="mb-4">
                 <input type="text" placeholder="Search properties..." value={searchTerm}
                        onChange={(e): void => setSearchTerm(e.target.value)}
-                       className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                       className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"/>
             </div>
+
+            <ConfirmDialog title="Are you sure?"
+                           confirmLabel="Delete"
+                           cancelLabel="Cancel"
+                           description="This action cannot be undone. It will permanently delete the property."
+                           isOpen={isDialogOpen}
+                           onConfirm={handleDelete}
+                           onCancel={(): void => setIsDialogOpen(false)}/>
 
             {isEditDialogOpen && (
                 <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
@@ -166,12 +161,15 @@ const PropertiesList = () => {
                                 className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none">
                             ✖
                         </button>
-                        <h2 className="text-2xl font-bold text-center mb-6">Create new property</h2>
+                        <h2 className="text-2xl font-bold text-center mb-6">Edit property</h2>
                         <PropertiesForm setIsOpen={setIsEditDialogOpen} propertyToEdit={propertyToEdit || undefined}/>
                     </div>
                 </div>
             )}
-            <DataTable columns={columns} data={filteredProperties}/>
+
+            <div className="max-h-[710px] overflow-y-auto">
+                <DataTable columns={columns} data={filteredProperties}/>
+            </div>
         </div>
     );
 };

@@ -7,6 +7,15 @@ import {Invoice} from "@/types/types";
 import {getCookie} from "@/utils/cookies";
 import {DataTable} from "@/components/common/DataTable";
 import {useInvoices} from "@/components/invoices/InvoiceContext";
+import {clsx} from "clsx";
+
+const statusColorMap: { [key: string]: string } = {
+    PAID: "green",
+    UNPAID: "red",
+    PENDING: "pink",
+    OVERDUE: "orange",
+    CANCELLED: "gray",
+};
 
 const InvoiceList = ({ isPrivileged }: { isPrivileged: boolean }) => {
     const { invoices, updateInvoiceStatus } = useInvoices();
@@ -125,11 +134,16 @@ const InvoiceList = ({ isPrivileged }: { isPrivileged: boolean }) => {
         },
         {
             accessorKey: "amount", header: "Amount to pay",
-            cell: ({ row }: { row: { original: { amount: number, status: string } } }) => (
-                <div style={{ color: row.original.status === "PAID" ? "green" : "red", fontWeight: "bold" }}>
-                    {row.original.status === "PAID" ? 0 : row.original.amount} kč
-                </div>
-            ),
+            cell: ({ row }: { row: { original: { amount: number, status: string }}}) => {
+                const status: string = row.original.status;
+                const color: string = statusColorMap[status.toUpperCase()] || "black";
+                const amountDisplay: number = status === "PAID" ? 0 : row.original.amount;
+                return (
+                    <div className={clsx("font-bold", `text-${color}-600`, status === "CANCELLED" && "line-through")}>
+                        {amountDisplay} Kč
+                    </div>
+                );
+            },
         },
         {
             accessorKey: "dueDate",
@@ -153,8 +167,8 @@ const InvoiceList = ({ isPrivileged }: { isPrivileged: boolean }) => {
                                 </>
                             ) : row.original.status === "PENDING" ? (
                                 <>
-                                    <div className="w-4 h-4 bg-yellow-500 rounded-full" title="Pending" />
-                                    <span className="text-yellow-600">Pending</span>
+                                    <div className="w-4 h-4 bg-pink-500 rounded-full" title="Pending" />
+                                    <span className="text-pink-600">Pending</span>
                                 </>
                             ) : row.original.status === "OVERDUE" ? (
                                 <>
@@ -193,7 +207,7 @@ const InvoiceList = ({ isPrivileged }: { isPrivileged: boolean }) => {
 
     return (
         <div className="mt-4 mx-4 p-6 bg-white shadow-sm rounded-xl border border-gray-200">
-            <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Invoices List</h1>
+            <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Invoices list</h1>
 
             {generalError && (
                 <div className="mb-4 text-red-600">
@@ -212,7 +226,10 @@ const InvoiceList = ({ isPrivileged }: { isPrivileged: boolean }) => {
                     <option value="CANCELLED">Cancelled</option>
                 </select>
             </div>
-            <DataTable key={filterStatus} columns={columns} data={filteredInvoices}/>
+
+            <div className="max-h-[710px] overflow-y-auto">
+                <DataTable key={filterStatus} columns={columns} data={filteredInvoices} />
+            </div>
         </div>
     );
 };

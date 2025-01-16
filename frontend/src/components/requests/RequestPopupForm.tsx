@@ -25,7 +25,7 @@ const RequestPopupForm = ({ properties=[] }: { properties: Property[] }) => {
                                 className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none">
                             ✖
                         </button>
-                        <h2 className="text-2xl font-bold text-center mb-6">Create new property</h2>
+                        <h2 className="text-2xl font-bold text-center mb-6">Create new request</h2>
                         <RequestsForm properties={properties} setIsOpen={setIsOpen}/>
                     </div>
                 </div>

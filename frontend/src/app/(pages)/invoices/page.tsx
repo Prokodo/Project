@@ -28,7 +28,7 @@ export default async function PropertiesPage(): Promise<ReactElement> {
         <main className="min-h-screen bg-gray-50">
             <header className="bg-blue-600 text-white py-4 shadow-md">
                 <div className="mx-auto px-10 flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Invoice Management</h1>
+                    <h1 className="text-2xl font-bold">Invoice management</h1>
 
                     <div className="relative group">
                         <HelpCircleIcon className="h-6 w-6 cursor-pointer"/>

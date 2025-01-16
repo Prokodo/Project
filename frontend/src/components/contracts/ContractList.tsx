@@ -7,10 +7,10 @@ import {DataTable} from "@/components/common/DataTable";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import ContractForm from "@/components/contracts/ContractsForm";
 import {useContracts} from "@/components/contracts/ContractContext";
+import {toast} from "sonner";
 
 const ContractList = ({ isPrivileged }: { isPrivileged: boolean }) => {
     const { contracts, setContracts } = useContracts();
-
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -57,11 +57,10 @@ const ContractList = ({ isPrivileged }: { isPrivileged: boolean }) => {
 
     const handleGenerateInvoice = async (contractId: number): Promise<void> => {
         try {
-            const issueDate = new Date().toISOString().split("T")[0];
             const dueDate = new Date();
             dueDate.setDate(dueDate.getDate() + 30);
-            const dueDateString = dueDate.toISOString().split("T")[0];
-
+            const issueDate: string = new Date().toISOString().split("T")[0];
+            const dueDateString: string = dueDate.toISOString().split("T")[0];
             const invoiceRequest = {
                 contractId,
                 issueDate,
@@ -80,7 +79,7 @@ const ContractList = ({ isPrivileged }: { isPrivileged: boolean }) => {
             });
 
             if (response.ok) {
-                alert("Invoice generated successfully.");
+                toast("New invoice has been successfully created!.");
             } else {
                 const errorText = `Failed to generate invoice: ${response.status} ${response.statusText}`;
                 setError(errorText);
@@ -121,39 +120,29 @@ const ContractList = ({ isPrivileged }: { isPrivileged: boolean }) => {
         columns.push({
             accessorKey: "actions", header: "Actions",
             cell: ({ row }: { row: { original: Contract } }) => (
-                <ConfirmDialog
-                    title="Are you sure?"
-                    confirmLabel="Delete"
-                    cancelLabel="Cancel"
-                    description="This action cannot be undone. It will permanently delete the property."
-                    isOpen={isDialogOpen} onConfirm={handleDelete}
-                    onCancel={(): void => setIsDialogOpen(false)}
-                    trigger={
-                        <div className="flex space-x-4">
-                            <button onClick={(): Promise<void> => handleGenerateInvoice(row.original.id)} className="text-green-600 hover:text-green-800">
-                                Generate Invoice
-                            </button>
-                            <button onClick={(): void => openEditDialog(row.original)} className="text-blue-600 hover:text-blue-800">
-                                Edit
-                            </button>
-                            <button onClick={(): void => openDeleteDialog(row.original)} className="text-red-600 hover:text-red-800">
-                                Delete
-                            </button>
-                        </div>
-                    }
-                />
+                <div className="flex space-x-4">
+                    <button onClick={() => handleGenerateInvoice(row.original.id)} className="text-green-600 hover:text-green-800">
+                        Generate Invoice
+                    </button>
+                    <button onClick={() => openEditDialog(row.original)} className="text-blue-600 hover:text-blue-800">
+                        Edit
+                    </button>
+                    <button onClick={() => openDeleteDialog(row.original)} className="text-red-600 hover:text-red-800">
+                        Delete
+                    </button>
+                </div>
             )
         });
     }
 
     return (
         <div className="mt-8 mx-4 p-6 bg-white shadow-sm rounded-xl border border-gray-200">
-            <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Contracts List</h1>
+            <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Contracts list</h1>
             {isPrivileged && (
                 <div className="mb-4">
                     <input type="text" placeholder="Quick Search (Tenant, Property, ID)"
                            value={searchTerm} onChange={(e): void => setSearchTerm(e.target.value)}
-                           className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                           className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"/>
                 </div>
             )}
 
@@ -163,14 +152,17 @@ const ContractList = ({ isPrivileged }: { isPrivileged: boolean }) => {
                 </div>
             )}
 
-            <DataTable columns={columns} data={filteredContracts} />
+            <div className="max-h-[710px] overflow-y-auto">
+                <DataTable columns={columns} data={filteredContracts}/>
+            </div>
+
             <ConfirmDialog title="Are you sure?"
                            confirmLabel="Delete"
                            cancelLabel="Cancel"
                            description="This action cannot be undone. It will permanently delete the contract."
                            isOpen={isDialogOpen}
                            onConfirm={handleDelete}
-                           onCancel={(): void => setIsDialogOpen(false)} />
+                           onCancel={(): void => setIsDialogOpen(false)}/>
 
             {isEditDialogOpen && (
                 <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
@@ -179,8 +171,8 @@ const ContractList = ({ isPrivileged }: { isPrivileged: boolean }) => {
                                 className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none">
                             ✖
                         </button>
-                        <h2 className="text-2xl font-bold text-center mb-6">Create new property</h2>
-                        <ContractForm setIsOpen={setIsEditDialogOpen} contractToEdit={contractToEdit} />
+                        <h2 className="text-2xl font-bold text-center mb-6">Edit contract</h2>
+                        <ContractForm setIsOpen={setIsEditDialogOpen} contractToEdit={contractToEdit}/>
                     </div>
                 </div>
             )}

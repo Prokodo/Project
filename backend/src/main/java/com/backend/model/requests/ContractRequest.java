@@ -1,6 +1,5 @@
 package com.backend.model.requests;
 
-
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;

@@ -20,12 +20,18 @@ const ConfirmDialog: React.FC<DialogProps> = ({
     onConfirm, onCancel, trigger
 }: DialogProps) => {
     return (
-        <AlertDialog open={isOpen}>
+        <AlertDialog open={isOpen}     onOpenChange={(open) => {
+            if (!open) {
+                onCancel();
+            }
+        }}>
             <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
             <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>{title}</AlertDialogTitle>
-                    <AlertDialogDescription>{description}</AlertDialogDescription>
+                <AlertDialogHeader className="flex justify-between items-start">
+                    <div>
+                        <AlertDialogTitle>{title}</AlertDialogTitle>
+                        <AlertDialogDescription>{description}</AlertDialogDescription>
+                    </div>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel asChild>

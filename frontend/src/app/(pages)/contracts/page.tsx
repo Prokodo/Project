@@ -16,7 +16,7 @@ import {Metadata} from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
     return {
-        title: 'TenantFlow | Login',
+        title: 'TenantFlow | Contracts',
     };
 }
 
@@ -44,7 +44,7 @@ export default async function PropertiesPage(): Promise<ReactElement> {
         <main className="min-h-screen bg-gray-50">
             <header className="bg-blue-600 text-white py-4 shadow-md">
                 <div className="mx-auto px-10 flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Tenants contract management</h1>
+                    <h1 className="text-2xl font-bold">Contract management</h1>
 
                     <div className="relative group">
                         <HelpCircleIcon className="h-6 w-6 cursor-pointer"/>

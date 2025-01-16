@@ -1,6 +1,5 @@
 package com.backend.model.requests;
 
-
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

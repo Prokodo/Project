@@ -5,11 +5,11 @@ import {ValidRoles} from "@/services/global";
 import {Property, Request} from "@/types/types";
 import React, {ChangeEvent, JSX, useMemo, useState} from "react";
 import {useProperties} from "@/components/properties/PropertiesContext";
+import {toast} from "sonner";
 
-const RequestsList = ({ roles=[] }: { roles: ValidRoles[] }): JSX.Element => {
+const RequestsList = (): JSX.Element => {
     const { properties } = useProperties();
 
-    const isAdmin: boolean = roles.includes("ROLE_ADMIN");
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [filterStatus, setFilterStatus] = useState<string | null>(null);
     const [requests, setRequests] = useState<Record<number, Request[]>>({});
@@ -38,8 +38,10 @@ const RequestsList = ({ roles=[] }: { roles: ValidRoles[] }): JSX.Element => {
                     cache: "no-store",
                 });
 
-                const fetchedRequests: Request[] = await response.json();
-                setRequests((prev) => ({ ...prev, [propertyId]: fetchedRequests }));
+                if (response.ok) {
+                    const fetchedRequests: Request[] = await response.json();
+                    setRequests((prev) => ({ ...prev, [propertyId]: fetchedRequests }));
+                }
             } catch (error) {
                 console.error("Failed to fetch requests:", error);
                 setRequests((prev) => ({ ...prev, [propertyId]: [] })); // Handle error gracefully
@@ -52,7 +54,7 @@ const RequestsList = ({ roles=[] }: { roles: ValidRoles[] }): JSX.Element => {
         try {
             const url: string = `http://localhost:8080/api/requests/status/${requestId}`;
             const authToken: string = getCookie("authToken") || "";
-            await fetch(url, {
+            const response = await fetch(url, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -63,12 +65,15 @@ const RequestsList = ({ roles=[] }: { roles: ValidRoles[] }): JSX.Element => {
                 }),
             });
 
-            setRequests((prev: any): any => {
-                const updatedRequests = prev[propertyId].map((request: any): any =>
-                    request.id === requestId ? { ...request, status: newStatus } : request
-                );
-                return { ...prev, [propertyId]: updatedRequests };
-            });
+            if (response.ok) {
+                setRequests((prev: any): any => {
+                    const updatedRequests = prev[propertyId].map((request: any): any =>
+                        request.id === requestId ? { ...request, status: newStatus } : request
+                    );
+                    return { ...prev, [propertyId]: updatedRequests };
+                });
+                toast("Request status has been successfully updated.");
+            }
         } catch (error) {
             console.error("Failed to update request status:", error);
         }
@@ -176,20 +181,16 @@ const RequestsList = ({ roles=[] }: { roles: ValidRoles[] }): JSX.Element => {
                                                     </div>
                                                 </div>
 
-                                                {isAdmin ? (
-                                                    <select value={request.status}
-                                                            className="ml-4 bg-transparent rerounded"
-                                                            onChange={(e: ChangeEvent<HTMLSelectElement>): Promise<void> =>
-                                                                updateRequestStatus(property.id, request.id, e.target.value)
-                                                            }>
-                                                        <option value="REQUESTED">Requested</option>
-                                                        <option value="IN_PROGRESS">In Progress</option>
-                                                        <option value="COMPLETED">Completed</option>
-                                                        <option value="REJECTED">Rejected</option>
-                                                    </select>
-                                                ) : (
-                                                    <span>{request.status}</span>
-                                                )}
+                                                <select value={request.status}
+                                                        className="ml-4 bg-transparent rerounded"
+                                                        onChange={(e: ChangeEvent<HTMLSelectElement>): Promise<void> =>
+                                                            updateRequestStatus(property.id, request.id, e.target.value)
+                                                        }>
+                                                    <option value="REQUESTED">Requested</option>
+                                                    <option value="IN_PROGRESS">In Progress</option>
+                                                    <option value="COMPLETED">Completed</option>
+                                                    <option value="REJECTED">Rejected</option>
+                                                </select>
                                             </li>
                                         ))}
                                     </ul>

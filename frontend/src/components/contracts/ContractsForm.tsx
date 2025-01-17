@@ -6,12 +6,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import {Dispatch, FC, SetStateAction, useState} from "react";
+import {Dispatch, FC, SetStateAction, useEffect, useState} from "react";
 import {Contract, Property, Tenant} from "@/types/types";
 import {useProperties} from "@/components/properties/PropertiesContext";
 import {useTenants} from "@/components/tenants/TenantContext";
 import {getCookie} from "@/utils/cookies";
 import {useContracts} from "@/components/contracts/ContractContext";
+import {toast} from "sonner";
 
 const contractSchema = z.object({
     propertyId: z.string().nonempty("Property is required!"),
@@ -40,6 +41,16 @@ const ContractForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, contractT
         },
     });
 
+    const propertyId: string = form.watch("propertyId");
+    useEffect((): void => {
+        if (propertyId) {
+            const selectedProperty: Property | undefined = properties.find((property: Property): boolean => property.id === Number(propertyId));
+            if (selectedProperty) {
+                form.setValue("monthlyRent", selectedProperty.price);
+            }
+        }
+    }, [propertyId, properties, form]);
+
     async function onSubmit(values: z.infer<typeof contractSchema>): Promise<void> {
         try {
             const url: string = contractToEdit ? `http://localhost:8080/api/contracts/${contractToEdit.id}` : "http://localhost:8080/api/contracts";
@@ -58,6 +69,8 @@ const ContractForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, contractT
                 if (contractToEdit) editContract(data);
                 else addContract(data);
                 setIsOpen(false);
+
+                toast(contractToEdit? "Contract has been successfully updated." : "New contract has been successfully created.");
             } else if (response.status === 400) {
                 const errorData = await response.json();
                 for (const [field, message] of Object.entries(errorData)) {
@@ -84,7 +97,7 @@ const ContractForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, contractT
                     <FormItem>
                         <FormLabel>Property</FormLabel>
                         <FormControl>
-                            <select {...field} value={field.value || ""} className="form-select">
+                            <select {...field} value={field.value || ""} className="form-select border ml-3 p-2 rounded">
                                 <option value="" disabled>Select a property</option>
                                 {properties.map((property: Property) => (
                                     <option key={property.id} value={property.id}>
@@ -101,7 +114,7 @@ const ContractForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, contractT
                     <FormItem>
                         <FormLabel>Tenant</FormLabel>
                         <FormControl>
-                            <select {...field} className="form-select">
+                            <select {...field} className="form-select border ml-3 p-2 rounded">
                                 <option value="" disabled>Select a tenant</option>
                                 {tenants.map((tenant) => (
                                     <option key={tenant.id} value={tenant.id}>
@@ -138,14 +151,14 @@ const ContractForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>, contractT
                     <FormItem>
                         <FormLabel>Monthly Rent (Kč)</FormLabel>
                         <FormControl>
-                            <Input type="number" min="0" step="0.01" placeholder="Enter monthly rent" {...field} />
+                            <Input type="number" disabled {...field} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
                 )} />
 
                 <Button type="submit">
-                    Submit
+                    {contractToEdit? "Save changes" : "Create new contract"}
                 </Button>
             </form>
         </Form>

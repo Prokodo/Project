@@ -10,6 +10,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/
 import {Tenant} from "@/types/types";
 import {useTenants} from "@/components/tenants/TenantContext";
 import {getCookie} from "@/utils/cookies";
+import {toast} from "sonner";
 
 const registrationSchema = z.object({
     username: z.string().nonempty("Username is required!"),
@@ -54,6 +55,8 @@ const TenantsRegistrationForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>
                 if (tenantToEdit) editTenant(data);
                 else addTenant(data);
                 setIsOpen(false);
+
+                toast(tenantToEdit? "User has been successfully updated." : "New user has been successfully created.");
             } else if (response.status === 400) {
                 const errorData = await response.json();
                 for (const [field, message] of Object.entries(errorData)) {
@@ -140,7 +143,7 @@ const TenantsRegistrationForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>
                         <FormItem>
                             <FormLabel>User role </FormLabel>
                             <FormControl>
-                                <select {...field} disabled={!isAdmin} className="border rounded p-2">
+                                <select {...field} disabled={!isAdmin} className="border ml-3 rounded p-2">
                                     <option value="TENANT">Tenant</option>
                                     <option value="MANAGER">Manager</option>
                                 </select>
@@ -151,7 +154,7 @@ const TenantsRegistrationForm: FC<{ setIsOpen: Dispatch<SetStateAction<boolean>>
                     :
                     <input type="hidden" value="TENANT" {...form.register("role")} />
                 }
-                <Button type="submit">{tenantToEdit? "Save changes" : "Register"}</Button>
+                <Button type="submit">{tenantToEdit? "Save changes" : "Register new user"}</Button>
             </form>
         </Form>
     );

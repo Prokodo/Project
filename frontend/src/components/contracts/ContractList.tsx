@@ -43,6 +43,7 @@ const ContractList = ({ isPrivileged }: { isPrivileged: boolean }) => {
                     setContracts(
                         (prevContracts: Contract[]): Contract[] => prevContracts.filter((contract: Contract): boolean => contract.id !== contractToEdit.id)
                     );
+                    toast("Contract has been successfully deleted.");
                 } else {
                     setError(`Failed to delete contract: ${response.statusText}`);
                 }

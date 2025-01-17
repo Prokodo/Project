@@ -8,6 +8,7 @@ import {getCookie} from "@/utils/cookies";
 import {DataTable} from "@/components/common/DataTable";
 import {useInvoices} from "@/components/invoices/InvoiceContext";
 import {clsx} from "clsx";
+import {toast} from "sonner";
 
 const statusColorMap: { [key: string]: string } = {
     PAID: "green",
@@ -44,6 +45,7 @@ const InvoiceList = ({ isPrivileged }: { isPrivileged: boolean }) => {
 
             if (response.ok) {
                 updateInvoiceStatus(id, currentStatus);
+                toast("Invoice status has been successfully updated.");
             } else {
                 const errorData = await response.json();
                 setGeneralError(errorData.message || "Failed to update invoice status.");

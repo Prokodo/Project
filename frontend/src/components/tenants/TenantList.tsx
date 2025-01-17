@@ -7,6 +7,7 @@ import {DataTable} from "@/components/common/DataTable";
 import {useTenants} from "@/components/tenants/TenantContext";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import TenantsRegistrationForm from "@/components/tenants/TenantsRegistrationForm";
+import {toast} from "sonner";
 
 const TenantsList = ({ isAdmin }: { isAdmin: boolean }) => {
     const { tenants, setTenants } = useTenants();
@@ -44,6 +45,7 @@ const TenantsList = ({ isAdmin }: { isAdmin: boolean }) => {
                     setTenants(tenants.filter(
                         (tenant: Tenant): boolean => tenant.id !== tenantToEdit.id
                     ));
+                    toast("Tenant has been successfully deleted.");
                 } else {
                     const errorText = `Failed to delete property: ${response.status} ${response.statusText}`;
                     setError(errorText);

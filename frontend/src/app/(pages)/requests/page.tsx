@@ -1,7 +1,7 @@
 import {ReactElement} from "react";
 import {redirect} from "next/navigation";
 import {getAuthToken} from "@/utils/auth";
-import {getUserRoles} from "@/services/global";
+import {getUserRoles, ValidRoles} from "@/services/global";
 import {fetchProperties} from "@/services/properties";
 import {RolesResponse} from "@/types/types";
 import RequestsList from "@/components/requests/RequestsList";
@@ -21,13 +21,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PropertiesPage(): Promise<ReactElement> {
     const authToken: string | undefined = await getAuthToken();
-    const roles: RolesResponse | undefined = await getUserRoles(authToken);
-    if (!roles?.loggedIn) {
+    const authResponse: RolesResponse | undefined = await getUserRoles(authToken);
+    if (!authResponse?.loggedIn) {
         redirect('/login');
     }
 
-    const isAdmin: boolean = roles.roles.includes("ROLE_ADMIN");
-
+    const isPrivileged: boolean = authResponse?.roles?.some((role: ValidRoles): boolean => ["ROLE_ADMIN", "ROLE_MANAGER"].includes(role)) || false;
     return (
         <main className="min-h-screen bg-gray-50">
             <header className="bg-blue-600 text-white py-4 shadow-md">
@@ -55,9 +54,9 @@ export default async function PropertiesPage(): Promise<ReactElement> {
             </header>
 
             <section className="mx-auto px-4 py-6">
-                {isAdmin?
+                {isPrivileged?
                     <PropertiesProvider initialProperties={await fetchProperties(authToken) || []}>
-                        <RequestsList roles={roles.roles}/>
+                        <RequestsList />
                     </PropertiesProvider>
                     :
                     <RequestProvider initialRequests={await fetchRequests(authToken) || []}>

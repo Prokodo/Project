@@ -5,6 +5,7 @@ import {getCookie} from "@/utils/cookies";
 import React, {JSX, useState} from "react";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import {useRequests} from "@/components/requests/RequestsContext";
+import {toast} from "sonner";
 
 const UserRequestsList = (): JSX.Element => {
     const { requests, setRequests } = useRequests();
@@ -35,6 +36,8 @@ const UserRequestsList = (): JSX.Element => {
                 );
                 setSelectedRequestId(null);
                 setIsDialogOpen(false);
+
+                toast("Request has been successfully deleted.");
             } else {
                 throw new Error(`Failed to delete request: ${response.statusText}`);
             }

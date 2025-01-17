@@ -7,6 +7,7 @@ import {DataTable} from "@/components/common/DataTable";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import PropertiesForm from "@/components/properties/PropertiesForm";
 import {useProperties} from "@/components/properties/PropertiesContext";
+import {toast} from "sonner";
 
 const PropertiesList = () => {
     const { properties, setProperties } = useProperties();
@@ -45,6 +46,7 @@ const PropertiesList = () => {
                         (property: Property): boolean => property.id !== propertyToEdit.id
                     );
                     setProperties(updatedProperties);
+                    toast("Property has been successfully deleted.");
                 } else {
                     const errorText = `Failed to delete property: ${response.status} ${response.statusText}`;
                     setError(errorText);
